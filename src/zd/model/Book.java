@@ -1,22 +1,21 @@
-package zd.data.entity;
+package zd.model;
 
 public class Book {
     private int id;
     private String name;
     private String author;
 
-    public Book(int id, String name, String author) {
-        this.id = id;
+    private static int count = 0;
+
+    public Book(String name, String author) {
+        count++;
+        this.id = count;
         this.name = name;
         this.author = author;
     }
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

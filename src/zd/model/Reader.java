@@ -1,20 +1,19 @@
-package zd.data.entity;
+package zd.model;
 
 public class Reader {
     private int id;
     private String name;
 
-    public Reader(int id, String name) {
-        this.id = id;
+    private static int count = 0;
+
+    public Reader(String name) {
+        count++;
+        this.id = count;
         this.name = name;
     }
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
