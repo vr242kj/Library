@@ -1,20 +1,21 @@
 package zd.model;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class Book {
-    private int id;
+    private long id;
     private String name;
     private String author;
 
-    private static int count = 0;
+    private static AtomicLong count = new AtomicLong(0);
 
     public Book(String name, String author) {
-        count++;
-        this.id = count;
+        this.id = count.incrementAndGet();
         this.name = name;
         this.author = author;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
