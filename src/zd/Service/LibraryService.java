@@ -2,6 +2,7 @@ package zd.Service;
 
 import zd.DAO.Dao;
 import zd.UI.UserInterface;
+
 import zd.model.Book;
 import zd.model.Reader;
 
@@ -9,16 +10,14 @@ public class LibraryService {
 
     private final Dao dao = new Dao();
 
-    public Reader getReaderById(String readerId) {
-        return dao.readers.stream().filter(x -> x.getId() == Integer.parseInt(readerId)).findFirst().get();
-    }
-
     public void currentReaderOfBook (String bookId) {
         if (bookId.matches("^\\s*\\d+\\s*$")) {
             if (dao.isExistBookById(bookId)) {
-                dao.bookAndReader.entrySet().stream()
-                        .filter(x -> x.getKey().equals(bookId))
-                        .forEach(x -> System.out.println(getReaderById(x.getValue())));
+                if (dao.getCurrentReaderOfBook(bookId) != null) {
+                    UserInterface.printItemInCollection(dao.getCurrentReaderOfBook(bookId));
+                } else {
+                    UserInterface.printErrorMessage(UserInterface.BOOK_IN_LIBRARY);
+                }
             } else {
                 UserInterface.printErrorMessage(UserInterface.BOOK_NOT_EXIST);
             }
@@ -27,16 +26,14 @@ public class LibraryService {
         }
     }
 
-    public Book getBookById (String bookId) {
-        return dao.books.stream().filter(x -> x.getId() == Integer.parseInt(bookId)).findFirst().get();
-    }
-
-    public void allBorrowedByReaderId (String readerId) {
+    public void allBorrowedBookByReaderId (String readerId) {
         if (readerId.matches("^\\s*\\d+\\s*$")) {
             if (dao.isExistReaderById(readerId)) {
-                dao.bookAndReader.entrySet().stream()
-                        .filter(x -> x.getValue().equals(readerId))
-                        .forEach(x -> System.out.println(getBookById(x.getKey()) + " "));
+                if (dao.getAllBorrowedBookByReaderId(readerId) != null) {
+                    UserInterface.printAllItemsInCollection(dao.getAllBorrowedBookByReaderId(readerId));;
+                } else {
+                    UserInterface.printErrorMessage(UserInterface.READER_DIDNT_BORROW_BOOK);
+                }
             } else {
                 UserInterface.printErrorMessage(UserInterface.READER_NOT_EXIST);
             }
@@ -82,14 +79,18 @@ public class LibraryService {
     }
 
     public void addNewReader (String fullName) {
-        dao.readers.add(new Reader(fullName));
+        if (fullName.matches("^[a-zA-Z]+\\s*[a-zA-Z]+$")) {
+            dao.readers.add(new Reader(fullName));
+        } else {
+            UserInterface.printErrorMessage(UserInterface.ILLEGAL_ARGUMENT_FOR_ADD_READER);
+        }
     }
 
     public void printAllBooks () {
-        UserInterface.printAllItems(dao.books);
+        UserInterface.printAllItemsInCollection(dao.books);
     }
 
     public void printAllReaders () {
-        UserInterface.printAllItems(dao.readers);
+        UserInterface.printAllItemsInCollection(dao.readers);
     }
 }

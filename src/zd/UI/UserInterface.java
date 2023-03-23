@@ -1,8 +1,6 @@
 package zd.UI;
 
 import zd.Service.LibraryService;
-import zd.model.Book;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -23,13 +21,16 @@ public class UserInterface {
                         
             TYPE “EXIT” TO STOP THE PROGRAM AND EXIT!""";
 
-    public static final String TRY_AGAIN = "\nIllegal Argument, try again (1, 2 or EXIT)";
+    public static final String TRY_AGAIN = "\nIllegal Argument, try again (numbers {1, 8} or EXIT)";
     public static final String JUST_NUMBER = "\nIllegal Argument, try again (just number)";
     public static final String BOOK_NOT_EXIST = "This book id doesn't exist";
     public static final String READER_NOT_EXIST = "This reader id doesn't exist";
     public static final String NOT_EXIST = "Book id or reader id doesn't exist";
-    public static final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Illegal Argument, try again like this: book id / reader id";
+    public static final String BOOK_IN_LIBRARY = "This book is in the library";
+    public static final String READER_DIDNT_BORROW_BOOK = "This reader hasn't borrowed the book yet";
+    public static final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Illegal Argument, try again only number";
     public static final String ILLEGAL_ARGUMENT_FOR_ADD_BOOK = "Illegal Argument, try again like this: name / author";
+    public static final String ILLEGAL_ARGUMENT_FOR_ADD_READER = "Illegal Argument, try again only letters";
     public static final String EXIT_MESSAGE = "\nGoodbye!";
 
     public static void printMenu() {
@@ -68,7 +69,7 @@ public class UserInterface {
                 case "7" -> {
                     System.out.println("Write reader id:");
                     String readerId = input.nextLine();
-                    libraryService.allBorrowedByReaderId(readerId.trim());
+                    libraryService.allBorrowedBookByReaderId(readerId.trim());
                 }
                 case "8" -> {
                     System.out.println("Write book id:");
@@ -89,8 +90,12 @@ public class UserInterface {
         System.out.println(message);
     }
 
-    public static <T> void printAllItems (List<T> data) {
+    public static <T> void printAllItemsInCollection (List<T> data) {
         data.forEach(System.out::println);
+    }
+
+    public static <T> void printItemInCollection (T item) {
+        System.out.println(item);
     }
 
     public static void printMapBookToReader(HashMap<String, String> bookAndReader) {
