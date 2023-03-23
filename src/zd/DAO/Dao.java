@@ -23,5 +23,11 @@ public class Dao {
         readers.add(new Reader( "Herman Melville"));
     }
 
+    public boolean isExistReaderById (String readerId) {
+        return readers.stream().anyMatch(x -> x.getId() == Integer.parseInt(readerId));
+    }
 
+    public boolean isExistBookById (String bookId) {
+        return books.stream().anyMatch(x -> x.getId() == Integer.parseInt(bookId));
+    }
 }

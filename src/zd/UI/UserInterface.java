@@ -1,6 +1,10 @@
 package zd.UI;
 
 import zd.Service.LibraryService;
+import zd.model.Book;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserInterface {
@@ -21,6 +25,11 @@ public class UserInterface {
 
     public static final String TRY_AGAIN = "\nIllegal Argument, try again (1, 2 or EXIT)";
     public static final String JUST_NUMBER = "\nIllegal Argument, try again (just number)";
+    public static final String BOOK_NOT_EXIST = "This book id doesn't exist";
+    public static final String READER_NOT_EXIST = "This reader id doesn't exist";
+    public static final String NOT_EXIST = "Book id or reader id doesn't exist";
+    public static final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Illegal Argument, try again like this: book id / reader id";
+    public static final String ILLEGAL_ARGUMENT_FOR_ADD_BOOK = "Illegal Argument, try again like this: name / author";
     public static final String EXIT_MESSAGE = "\nGoodbye!";
 
     public static void printMenu() {
@@ -43,52 +52,28 @@ public class UserInterface {
                 case "4" -> {
                     System.out.println("Please enter new book name and author separated by \"/\". Like this: name / author");
                     String inputNameAndAuthor = input.nextLine();
-                    if (inputNameAndAuthor.matches("^\\s*\\D([a-zA-Z]+)(\\s\\/\\s)([a-zA-Z]+\\s*)$")) {
-                        String[] nameAndAuthor = inputNameAndAuthor.split("/");
-                        libraryService.addNewBook(nameAndAuthor);
-                    } else {
-                        System.out.println("Illegal Argument, try again like this: name / author");
-                   }
+                    libraryService.addNewBook(inputNameAndAuthor);
                 }
                 case "5" -> {
-                    System.out.println("Please enter new book id and reader id separated by “/”. Like this: book id / reader id");
+                    System.out.println("Please enter new book id and reader id separated by \"/\". Like this: book id / reader id");
                     String inputBookIDAndAuthorID = input.nextLine();
-                    if (inputBookIDAndAuthorID.matches("^\\s*(\\d+)(\\s\\/\\s)(\\d+\\s*)$")) {
-                        String[] bookIdAndAuthorId = inputBookIDAndAuthorID.split("/");
-                        libraryService.borrowBookToReader(bookIdAndAuthorId);
-                        System.out.println("New map is: ");
-                        libraryService.printBookAndReader();
-                    } else {
-                        System.out.println("Illegal Argument, try again like this: book id / reader id");
-                    }
+                    libraryService.borrowBookToReader(inputBookIDAndAuthorID);
                 }
                 case "6" -> {
                     System.out.println("Write book id:");
                     String bookId = input.nextLine();
-                    if (bookId.matches("^\\s*\\d+\\s*$")) {
-                        libraryService.returnBook(bookId.trim());
-                    } else {
-                        System.out.println(JUST_NUMBER);
-                    }
+                    libraryService.returnBook(bookId.trim());
                 }
 
                 case "7" -> {
                     System.out.println("Write reader id:");
                     String readerId = input.nextLine();
-                    if (readerId.matches("^\\s*\\d+\\s*$")) {
-                        libraryService.allBorrowedByReaderId(readerId.trim());
-                    } else {
-                        System.out.println(JUST_NUMBER);
-                    }
+                    libraryService.allBorrowedByReaderId(readerId.trim());
                 }
                 case "8" -> {
                     System.out.println("Write book id:");
                     String bookId = input.nextLine();
-                    if (bookId.matches("^\\s*\\d+\\s*$")) {
-                        libraryService.currentReaderOfBook(bookId.trim());
-                    } else {
-                        System.out.println(JUST_NUMBER);
-                    }
+                    libraryService.currentReaderOfBook(bookId.trim());
                 }
                 case "EXIT" -> {
                     input.close();
@@ -98,5 +83,19 @@ public class UserInterface {
                 default -> System.out.println(TRY_AGAIN);
             }
         }
+    }
+
+    public static void printErrorMessage (String message) {
+        System.out.println(message);
+    }
+
+    public static <T> void printAllItems (List<T> data) {
+        data.forEach(System.out::println);
+    }
+
+    public static void printMapBookToReader(HashMap<String, String> bookAndReader) {
+        System.out.println("New map is: ");
+        bookAndReader.entrySet()
+                .forEach(System.out::println);
     }
 }
