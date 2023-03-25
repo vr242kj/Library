@@ -1,18 +1,16 @@
-package zd.model;
+package entity;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Book {
+public class Reader {
     private long id;
     private String name;
-    private String author;
 
     private static AtomicLong count = new AtomicLong(0);
 
-    public Book(String name, String author) {
+    public Reader(String name) {
         this.id = count.incrementAndGet();
         this.name = name;
-        this.author = author;
     }
 
     public long getId() {
@@ -27,20 +25,11 @@ public class Book {
         this.name = name;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     @Override
     public String toString() {
-        return "Book{" +
+        return "Reader{" +
                 "id=" + id +
                 ", name=" + name +
-                ", author=" + author +
                 '}';
     }
 }
