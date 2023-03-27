@@ -95,7 +95,7 @@ public class LibraryService {
         }
 
         String[] nameAndAuthor = inputNameAndAuthor.split("/");
-        daoBookImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim()));
+        daoBookImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim(), 0));
     }
 
     public void addNewReader(String fullName) throws IllegalArgumentException {
