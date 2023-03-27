@@ -1,20 +1,20 @@
-package zd.data.entity;
+package entity;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Reader {
-    private int id;
+    private long id;
     private String name;
 
-    public Reader(int id, String name) {
-        this.id = id;
+    private static AtomicLong count = new AtomicLong(0);
+
+    public Reader(String name) {
+        this.id = count.incrementAndGet();
         this.name = name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
