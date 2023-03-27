@@ -25,8 +25,6 @@ public class UserInterface {
     private static final String TRY_AGAIN = "\nIllegal Argument, try again (numbers {1, 8} or EXIT)";
     private static final String EXIT_MESSAGE = "\nGoodbye!";
 
-    private final String BOOK_IN_LIBRARY = "This book is in the library";
-
     private final LibraryService libraryService = new LibraryService();
     private final Scanner input = new Scanner(System.in);
 
@@ -83,25 +81,25 @@ public class UserInterface {
     private void returnBookToLibrary () {
         System.out.println("Write book id:");
         String bookId = input.nextLine();
-
-        if (libraryService.returnBook(bookId.trim()) == null) {
-            System.out.println(BOOK_IN_LIBRARY);
-        } else {
-            System.out.println("Book return successful");
-        }
+        libraryService.returnBook(bookId.trim());
+        System.out.println("Book return successful");
     }
 
     private void showAllBorrowedBookById () {
         System.out.println("Write reader id:");
         String readerId = input.nextLine();
-        printAllItemsInCollection(libraryService.allBorrowedBookByReaderId(readerId.trim()));
+        if (libraryService.allBorrowedBookByReaderId(readerId.trim()).isEmpty()) {
+            System.out.println("This reader hasn't borrowed the book yet");
+        } else {
+            printAllItemsInCollection(libraryService.allBorrowedBookByReaderId(readerId.trim()));
+        }
     }
 
     private void showCurrentReaderOfBookByReaderId () {
         System.out.println("Write book id:");
         String bookId = input.nextLine();
         if (libraryService.currentReaderOfBook(bookId.trim()).isEmpty()) {
-            System.out.println(BOOK_IN_LIBRARY);
+            System.out.println("This book is in the library");
         } else {
             printItemInCollection(libraryService.currentReaderOfBook(bookId.trim()));
         }
