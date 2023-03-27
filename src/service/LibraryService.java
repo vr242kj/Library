@@ -10,14 +10,13 @@ import java.util.Optional;
 
 public class LibraryService {
 
-    private final String JUST_NUMBER = "\nIllegal Argument, try again (just number)";
-    private final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Illegal Argument, try again only number";
-    private final String ILLEGAL_ARGUMENT_FOR_ADD_BOOK = "Illegal Argument, try again like this: name / author";
-    private final String ILLEGAL_ARGUMENT_FOR_ADD_READER = "Illegal Argument, try again only letters";
+    private final String JUST_NUMBER = "\nInput must be numeric";
+    private final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Book ID must be numeric";
+    private final String ILLEGAL_ARGUMENT_FOR_ADD_BOOK = "Try again like this: name / author";
+    private final String ILLEGAL_ARGUMENT_FOR_ADD_READER = "Full name must be literal";
 
     private final String BOOK_NOT_EXIST = "This book id doesn't exist";
     private final String READER_NOT_EXIST = "This reader id doesn't exist";
-    private final String NOT_EXIST = "Book id or reader id doesn't exist";
 
     private final DaoBookImplementation daoBookImplementation = new DaoBookImplementation();
     private final DaoReaderImplementation daoReaderImplementation = new DaoReaderImplementation();
@@ -32,11 +31,13 @@ public class LibraryService {
         daoBookImplementation.findById(bookID)
                 .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
 
-        if (daoBookImplementation.findCurrentReaderOfBook(bookID) == null) {
+        long userID = daoBookImplementation.findReaderIdByBookId(bookID);
+
+        if (userID == 0L) {
             return Optional.empty();
         }
 
-        return daoReaderImplementation.findById(daoBookImplementation.findCurrentReaderOfBook(bookID));
+        return daoReaderImplementation.findById(userID);
     }
 
     public List<Book> allBorrowedBookByReaderId(String readerId) throws IllegalArgumentException {
@@ -49,7 +50,7 @@ public class LibraryService {
         daoReaderImplementation.findById(readerID)
                 .orElseThrow(() -> new IllegalArgumentException(READER_NOT_EXIST));
 
-        return daoBookImplementation.findAllBorrowedBookByReaderId(readerID);
+        return daoBookImplementation.findAllByReaderId(readerID);
     }
 
     public void returnBook(String bookId) throws IllegalArgumentException {
@@ -76,8 +77,12 @@ public class LibraryService {
         long bookID = Long.parseLong(bookIdAndAuthorId[0].trim());
         long readerID = Long.parseLong(bookIdAndAuthorId[1].trim());
 
-        if (daoReaderImplementation.findById(bookID).isEmpty() && daoBookImplementation.findById(readerID).isEmpty()) {
-            throw new IllegalArgumentException(NOT_EXIST);
+        if (daoReaderImplementation.findById(bookID).isEmpty()) {
+            throw new IllegalArgumentException(READER_NOT_EXIST);
+        }
+
+        if (daoBookImplementation.findById(readerID).isEmpty()) {
+            throw new IllegalArgumentException(BOOK_NOT_EXIST);
         }
 
         daoBookImplementation.borrowBookToReader(bookID, readerID);

@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface DaoBookInterface {
     List<Book> findAll ();
     Optional<Book> findById (long id);
-    List<Book> findAllBorrowedBookByReaderId (long readerId);
+    List<Book> findAllByReaderId (long readerId);
     Book save (Book bookToSave);
     void borrowBookToReader (long bookId, long readerId);
     void returnBookToLibrary(long bookId);
-    Long findCurrentReaderOfBook (long bookId);
+    Long findReaderIdByBookId (long bookId);
 }

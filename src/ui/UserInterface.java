@@ -1,5 +1,7 @@
 package ui;
 
+import entity.Book;
+import entity.Reader;
 import service.LibraryService;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public class UserInterface {
                         
             TYPE “EXIT” TO STOP THE PROGRAM AND EXIT!""";
 
-    private static final String TRY_AGAIN = "\nIllegal Argument, try again (numbers {1, 8} or EXIT)";
+    private static final String TRY_AGAIN = "\nTry again (numbers {1, 8} or EXIT)";
     private static final String EXIT_MESSAGE = "\nGoodbye!";
 
     private final LibraryService libraryService = new LibraryService();
@@ -41,8 +43,8 @@ public class UserInterface {
                     case "4" -> addNewBook();
                     case "5" -> borrowBookToReader();
                     case "6" -> returnBookToLibrary();
-                    case "7" -> showAllBorrowedBookById();
-                    case "8" -> showCurrentReaderOfBookByReaderId();
+                    case "7" -> printAllBorrowedBookById();
+                    case "8" -> printCurrentReaderOfBookByReaderId();
                     case "EXIT" -> exitFromProgram();
                     default -> throw new IllegalArgumentException(UserInterface.TRY_AGAIN);
                 }
@@ -85,23 +87,27 @@ public class UserInterface {
         System.out.println("Book return successful");
     }
 
-    private void showAllBorrowedBookById () {
+    private void printAllBorrowedBookById () {
         System.out.println("Write reader id:");
         String readerId = input.nextLine();
-        if (libraryService.allBorrowedBookByReaderId(readerId.trim()).isEmpty()) {
+        List<Book> listOfBooks = libraryService.allBorrowedBookByReaderId(readerId.trim());
+
+        if (listOfBooks.isEmpty()) {
             System.out.println("This reader hasn't borrowed the book yet");
         } else {
-            printAllItemsInCollection(libraryService.allBorrowedBookByReaderId(readerId.trim()));
+            listOfBooks.forEach(System.out::println);
         }
     }
 
-    private void showCurrentReaderOfBookByReaderId () {
+    private void printCurrentReaderOfBookByReaderId () {
         System.out.println("Write book id:");
         String bookId = input.nextLine();
-        if (libraryService.currentReaderOfBook(bookId.trim()).isEmpty()) {
+        Optional<Reader> currentReader = libraryService.currentReaderOfBook(bookId.trim());
+
+        if (currentReader.isEmpty()) {
             System.out.println("This book is in the library");
         } else {
-            printItemInCollection(libraryService.currentReaderOfBook(bookId.trim()));
+            System.out.println(currentReader.get());
         }
     }
 
@@ -109,13 +115,5 @@ public class UserInterface {
         input.close();
         System.out.println(EXIT_MESSAGE);
         System.exit(0);
-    }
-
-    private <T> void printAllItemsInCollection (List<T> data) {
-        data.forEach(System.out::println);
-    }
-
-    public <T> void printItemInCollection (Optional<T> item) {
-        System.out.println(item.get());
     }
 }

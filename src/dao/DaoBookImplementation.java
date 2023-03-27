@@ -26,7 +26,7 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public List<Book> findAllBorrowedBookByReaderId(long readerId) {
+    public List<Book> findAllByReaderId(long readerId) {
         List<Long> bookIds = booksAndReaders.entrySet()
                 .stream()
                 .filter(bookAndReader -> bookAndReader.getValue().equals(readerId))
@@ -57,7 +57,7 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public Long findCurrentReaderOfBook(long bookId) {
+    public Long findReaderIdByBookId(long bookId) {
         return booksAndReaders.get(bookId);
     }
 }
