@@ -28,8 +28,8 @@ public class Reader {
     @Override
     public String toString() {
         return "Reader{" +
-                "id=" + id +
-                ", name=" + name +
+                "id = " + id +
+                " , name = " + name +
                 '}';
     }
 }

@@ -48,10 +48,10 @@ public class Book {
     @Override
     public String toString() {
         return "Book{" +
-                "id= " + id +
+                "id = " + id +
                 ", name='" + name + '\'' +
                 ", author='" + author + '\'' +
-                ", readerId= " + readerId +
+                ", readerId = " + readerId +
                 '}';
     }
 }
