@@ -1,20 +1,21 @@
 package entity;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 public class Book {
     private long id;
     private String name;
     private String author;
     private long readerId;
 
-    private static AtomicLong count = new AtomicLong(0);
-
-    public Book(String name, String author, long readerId) {
-        this.id = count.incrementAndGet();
+    public Book(long id, String name, String author, long readerId) {
+        this.id = id;
         this.name = name;
         this.author = author;
         this.readerId = readerId;
+    }
+
+   public Book(String name, String author) {
+        this.name = name;
+        this.author = author;
     }
 
     public long getId() {
@@ -48,10 +49,10 @@ public class Book {
     @Override
     public String toString() {
         return "Book{" +
-                "id= " + id +
-                ", name='" + name + '\'' +
-                ", author='" + author + '\'' +
-                ", readerId= " + readerId +
+                "id = " + id +
+                ", name = '" + name + '\'' +
+                ", author = '" + author + '\'' +
+                ", readerId = " + readerId +
                 '}';
     }
 }

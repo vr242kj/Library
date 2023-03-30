@@ -1,7 +1,7 @@
 package service;
 
-import dao.DaoBookImplementation;
-import dao.DaoReaderImplementation;
+import dao.BookDaoImplementation;
+import dao.ReaderDaoImplementation;
 import entity.Book;
 import entity.Reader;
 
@@ -18,26 +18,26 @@ public class LibraryService {
     private final String BOOK_NOT_EXIST = "This book id doesn't exist";
     private final String READER_NOT_EXIST = "This reader id doesn't exist";
 
-    private final DaoBookImplementation daoBookImplementation = new DaoBookImplementation();
-    private final DaoReaderImplementation daoReaderImplementation = new DaoReaderImplementation();
+    private final BookDaoImplementation bookDaoImplementation = new BookDaoImplementation();
+    private final ReaderDaoImplementation readerDaoImplementation = new ReaderDaoImplementation();
 
-    public Optional<Reader> currentReaderOfBook(String bookId) throws IllegalArgumentException {
+   public Optional<Reader> currentReaderOfBook(String bookId) throws IllegalArgumentException {
         if (!bookId.matches("^\\s*\\d+\\s*$")) {
             throw new IllegalArgumentException(JUST_NUMBER);
         }
 
         long bookID = Long.parseLong(bookId);
 
-        daoBookImplementation.findById(bookID)
+       bookDaoImplementation.findById(bookID)
                 .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
 
-        long userID = daoBookImplementation.findReaderIdByBookId(bookID);
+        long userID = bookDaoImplementation.findReaderIdByBookId(bookID);
 
         if (userID == 0L) {
             return Optional.empty();
         }
 
-        return daoReaderImplementation.findById(userID);
+        return readerDaoImplementation.findById(userID);
     }
 
     public List<Book> allBorrowedBookByReaderId(String readerId) throws IllegalArgumentException {
@@ -47,10 +47,10 @@ public class LibraryService {
 
         long readerID = Long.parseLong(readerId);
 
-        daoReaderImplementation.findById(readerID)
+        readerDaoImplementation.findById(readerID)
                 .orElseThrow(() -> new IllegalArgumentException(READER_NOT_EXIST));
 
-        return daoBookImplementation.findAllByReaderId(readerID);
+        return bookDaoImplementation.findAllByReaderId(readerID);
     }
 
     public void returnBook(String bookId) throws IllegalArgumentException {
@@ -60,10 +60,10 @@ public class LibraryService {
 
         long bookID = Long.parseLong(bookId);
 
-        daoBookImplementation.findById(bookID)
+        bookDaoImplementation.findById(bookID)
                 .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
 
-        daoBookImplementation.returnBookToLibrary(bookID);
+        bookDaoImplementation.returnBookToLibrary(bookID);
     }
 
 
@@ -77,15 +77,15 @@ public class LibraryService {
         long bookID = Long.parseLong(bookIdAndAuthorId[0].trim());
         long readerID = Long.parseLong(bookIdAndAuthorId[1].trim());
 
-        if (daoReaderImplementation.findById(bookID).isEmpty()) {
-            throw new IllegalArgumentException(READER_NOT_EXIST);
-        }
-
-        if (daoBookImplementation.findById(readerID).isEmpty()) {
+        if (bookDaoImplementation.findById(readerID).isEmpty()) {
             throw new IllegalArgumentException(BOOK_NOT_EXIST);
         }
 
-        daoBookImplementation.borrowBookToReader(bookID, readerID);
+        if (readerDaoImplementation.findById(bookID).isEmpty()) {
+            throw new IllegalArgumentException(READER_NOT_EXIST);
+        }
+
+        bookDaoImplementation.borrowBookToReader(bookID, readerID);
     }
 
 
@@ -95,7 +95,7 @@ public class LibraryService {
         }
 
         String[] nameAndAuthor = inputNameAndAuthor.split("/");
-        daoBookImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim(), 0));
+        bookDaoImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim()));
     }
 
     public void addNewReader(String fullName) throws IllegalArgumentException {
@@ -103,14 +103,14 @@ public class LibraryService {
             throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_ADD_READER);
         }
 
-        daoReaderImplementation.save(new Reader(fullName));
+        readerDaoImplementation.save(new Reader(fullName));
     }
 
     public List<Book> findAllBooks () {
-        return daoBookImplementation.findAll();
+        return bookDaoImplementation.findAll();
     }
 
     public List<Reader> findAllReaders () {
-        return daoReaderImplementation.findAll();
+        return readerDaoImplementation.findAll();
     }
 }

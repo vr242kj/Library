@@ -10,9 +10,9 @@ public class DaoReaderImplementation implements DaoReaderInterface{
     private final List<Reader> readers = new ArrayList<Reader>();
 
     public DaoReaderImplementation () {
-        save(new Reader( "Gabriel Garcia Marquez"));
-        save(new Reader( "F. Scott Fitzgerald"));
-        save(new Reader( "Herman Melville"));
+        //save(new Reader( "Gabriel Garcia Marquez"));
+        //save(new Reader( "F. Scott Fitzgerald"));
+        //save(new Reader( "Herman Melville"));
     }
 
     @Override

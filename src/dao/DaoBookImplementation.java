@@ -8,10 +8,11 @@ import java.util.stream.Collectors;
 public class DaoBookImplementation implements DaoBookInterface {
     private final List<Book> books = new ArrayList<Book>();
 
-    public DaoBookImplementation () {
-        save(new Book("In Search of Lost Time", "Marcel Proust", 0));
-        save(new Book( " Ulysses", "James Joyce", 0));
-        save(new Book( " Don Quixote", "Miguel de Cervantes", 0));
+    public DaoBookImplementation() {
+        //save(new Book("In Search of Lost Time", "Marcel Proust", 0));
+        //save(new Book(" Ulysses", "James Joyce", 0));
+        //save(new Book(" Don Quixote", "Miguel de Cervantes", 0));
+
     }
 
     @Override

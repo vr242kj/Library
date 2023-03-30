@@ -1,15 +1,16 @@
 package entity;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 public class Reader {
     private long id;
     private String name;
 
-    private static AtomicLong count = new AtomicLong(0);
+
+    public Reader(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Reader(String name) {
-        this.id = count.incrementAndGet();
         this.name = name;
     }
 
@@ -28,8 +29,8 @@ public class Reader {
     @Override
     public String toString() {
         return "Reader{" +
-                "id=" + id +
-                ", name=" + name +
+                "id = " + id +
+                ", name = " + name +
                 '}';
     }
 }
