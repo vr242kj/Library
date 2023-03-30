@@ -2,9 +2,7 @@ package dao;
 
 import entity.Book;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +13,6 @@ public class BookDaoImplementation implements DaoBookInterface {
 
     ConnectionUtil db = new ConnectionUtil();
     Connection connection = db.connectionToDatabase("library", "postgres", "olimp123");
-
     Statement statement;
     ResultSet rs;
 
@@ -87,7 +84,7 @@ public class BookDaoImplementation implements DaoBookInterface {
             String query = String.format("update %s set readerId='%s' where id='%s'", "book", readerId, bookId);
             statement = connection.createStatement();
             statement.executeUpdate(query);
-            System.out.println("Row Inserted");
+            System.out.println("Row Update");
         }catch (Exception e){
             System.out.println(e);
         }
@@ -96,15 +93,15 @@ public class BookDaoImplementation implements DaoBookInterface {
     @Override
     public void returnBookToLibrary(long bookId) {
         try {
-            String query = String.format("update %s set readerId='%s' where id='%s'", "book", 0, bookId);
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
-            System.out.println("Row Inserted");
+            PreparedStatement preparedStatement = connection.prepareStatement("update book set readerId = ? where id = ?");
+            preparedStatement.setNull(1, Types.INTEGER);
+            preparedStatement.setLong(2, bookId);
+            preparedStatement.executeUpdate();
+            System.out.println("Row Update");
         }catch (Exception e){
             System.out.println(e);
         }
     }
-
 
     @Override
     public Long findReaderIdByBookId(long bookId) {
