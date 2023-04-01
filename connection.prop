@@ -1,0 +1,4 @@
+Dname = sun.jdbc.odbc.JdbcOdbcDriver
+URL = jdbc:postgresql://localhost:5432/library
+user = postgres
+password = olimp123

@@ -26,14 +26,14 @@ public class LibraryService {
             throw new IllegalArgumentException(JUST_NUMBER);
         }
 
-        long bookID = Long.parseLong(bookId);
+        int bookID = Integer.parseInt(bookId);
 
        bookDaoImplementation.findById(bookID)
                 .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
 
-        long userID = bookDaoImplementation.findReaderIdByBookId(bookID);
+        int userID = bookDaoImplementation.findReaderIdByBookId(bookID);
 
-        if (userID == 0L) {
+        if (userID == 0) {
             return Optional.empty();
         }
 
@@ -45,7 +45,7 @@ public class LibraryService {
             throw new IllegalArgumentException(JUST_NUMBER);
         }
 
-        long readerID = Long.parseLong(readerId);
+        int readerID = Integer.parseInt(readerId);
 
         readerDaoImplementation.findById(readerID)
                 .orElseThrow(() -> new IllegalArgumentException(READER_NOT_EXIST));
@@ -58,7 +58,7 @@ public class LibraryService {
             throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
         }
 
-        long bookID = Long.parseLong(bookId);
+        int bookID = Integer.parseInt(bookId);
 
         bookDaoImplementation.findById(bookID)
                 .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
@@ -74,8 +74,8 @@ public class LibraryService {
         }
 
         String[] bookIdAndAuthorId = inputBookIDAndReaderID.split("/");
-        long bookID = Long.parseLong(bookIdAndAuthorId[0].trim());
-        long readerID = Long.parseLong(bookIdAndAuthorId[1].trim());
+        int bookID = Integer.parseInt(bookIdAndAuthorId[0].trim());
+        int readerID = Integer.parseInt(bookIdAndAuthorId[1].trim());
 
         if (bookDaoImplementation.findById(readerID).isEmpty()) {
             throw new IllegalArgumentException(BOOK_NOT_EXIST);

@@ -21,13 +21,13 @@ public class DaoReaderImplementation implements DaoReaderInterface{
     }
 
     @Override
-    public Optional<Reader> findById(long id) {
+    public Optional<Reader> findById(int id) {
         return readers.stream().filter(reader -> reader.getId() == id).findFirst();
     }
 
     @Override
-    public Reader save(Reader readerToSave) {
+    public Optional<Reader> save(Reader readerToSave) {
         readers.add(readerToSave);
-        return readerToSave;
+        return Optional.of(readerToSave);
     }
 }

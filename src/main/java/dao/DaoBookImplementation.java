@@ -21,35 +21,35 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public Optional<Book> findById (long id) {
+    public Optional<Book> findById (int id) {
         return books.stream().filter(book -> book.getId() == id).findFirst();
     }
 
     @Override
-    public List<Book> findAllByReaderId (long readerId) {
+    public List<Book> findAllByReaderId (int readerId) {
         return books.stream()
                 .filter(book -> book.getReaderId() == readerId)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Book save (Book bookToSave) {
+    public Optional<Book> save (Book bookToSave) {
         books.add(bookToSave);
-        return bookToSave;
+        return Optional.of(bookToSave);
     }
 
     @Override
-    public void borrowBookToReader (long bookId, long readerId) {
+    public void borrowBookToReader (int bookId, int readerId) {
         findById(bookId).get().setReaderId(readerId);
     }
 
     @Override
-    public void returnBookToLibrary (long bookId) {
+    public void returnBookToLibrary (int bookId) {
         findById(bookId).get().setReaderId(0);
     }
 
     @Override
-    public Long findReaderIdByBookId (long bookId) {
+    public Integer findReaderIdByBookId (int bookId) {
         return findById(bookId).get().getReaderId();
     }
 }

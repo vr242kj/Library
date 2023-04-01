@@ -9,8 +9,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class UserInterface {
-    private static final String WELCOME_LINE = "WELCOME TO THE LIBRARY!";
-    private static final String MENU = """
+    private final String MENU = """
                         
             PLEASE,SELECT ONE OF THE FOLLOWING ACTIONS BY TYPING THE OPTION’S NUMBER AND PRESSING ENTER KEY:
             \t[1]SHOW ALL BOOKS IN THE LIBRARY
@@ -24,18 +23,17 @@ public class UserInterface {
                         
             TYPE “EXIT” TO STOP THE PROGRAM AND EXIT!""";
 
-    private static final String TRY_AGAIN = "\nTry again (numbers {1, 8} or EXIT)";
-    private static final String EXIT_MESSAGE = "\nGoodbye!";
-
     private final LibraryService libraryService = new LibraryService();
     private final Scanner input = new Scanner(System.in);
 
     public void printMenu() {
+        String WELCOME_LINE = "WELCOME TO THE LIBRARY!";
         System.out.println(WELCOME_LINE);
 
         while (true) {
             System.out.println(MENU);
             try {
+                String TRY_AGAIN = "\nTry again (numbers {1, 8} or EXIT)";
                 switch (input.nextLine()) {
                     case "1" -> printAllBooks();
                     case "2" -> printAllReaders();
@@ -46,7 +44,7 @@ public class UserInterface {
                     case "7" -> printAllBorrowedBookById();
                     case "8" -> printCurrentReaderOfBookByReaderId();
                     case "EXIT" -> exitFromProgram();
-                    default -> throw new IllegalArgumentException(UserInterface.TRY_AGAIN);
+                    default -> throw new IllegalArgumentException(TRY_AGAIN);
                 }
             } catch (IllegalArgumentException e){
                 System.err.println(e);
@@ -113,6 +111,7 @@ public class UserInterface {
 
     private void exitFromProgram () {
         input.close();
+        String EXIT_MESSAGE = "\nGoodbye!";
         System.out.println(EXIT_MESSAGE);
         System.exit(0);
     }

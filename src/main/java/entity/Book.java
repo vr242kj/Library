@@ -1,12 +1,12 @@
 package entity;
 
 public class Book {
-    private long id;
+    private int id;
     private String name;
     private String author;
-    private long readerId;
+    private int readerId;
 
-    public Book(long id, String name, String author, long readerId) {
+    public Book(int id, String name, String author, int readerId) {
         this.id = id;
         this.name = name;
         this.author = author;
@@ -18,15 +18,15 @@ public class Book {
         this.author = author;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public long getReaderId() {
+    public int getReaderId() {
         return readerId;
     }
 
-    public void setReaderId(long readerId) {
+    public void setReaderId(int readerId) {
         this.readerId = readerId;
     }
 
