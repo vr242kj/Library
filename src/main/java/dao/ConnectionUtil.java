@@ -9,7 +9,7 @@ public class ConnectionUtil {
     public Properties loadPropertiesFile() throws Exception {
 
         Properties prop = new Properties();
-        InputStream in = new FileInputStream("connection.prop");
+        InputStream in = new FileInputStream("src/main/resources/jdbc.properties");
         prop.load(in);
         in.close();
         return prop;
@@ -18,7 +18,6 @@ public class ConnectionUtil {
     public Properties propertiesForConnection () {
 
         Properties prop = new Properties();
-
         try {
             prop = loadPropertiesFile();
         } catch (Exception e) {
