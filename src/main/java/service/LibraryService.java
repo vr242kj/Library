@@ -11,7 +11,7 @@ import java.util.Optional;
 public class LibraryService {
 
     private final String JUST_NUMBER = "\nInput must be numeric";
-    private final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Book ID must be numeric";
+    private final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Book ID and Reade ID must be numeric";
     private final String ILLEGAL_ARGUMENT_FOR_ADD_BOOK = "Try again like this: name / author";
     private final String ILLEGAL_ARGUMENT_FOR_ADD_READER = "Full name must be literal";
 
@@ -21,56 +21,56 @@ public class LibraryService {
     private final BookDaoImplementation bookDaoImplementation = new BookDaoImplementation();
     private final ReaderDaoImplementation readerDaoImplementation = new ReaderDaoImplementation();
 
-   public Optional<Reader> currentReaderOfBook(String bookId) throws IllegalArgumentException {
+   public Optional<Reader> currentReaderOfBook (String bookId) {
         if (!bookId.matches("^\\s*\\d+\\s*$")) {
-            throw new IllegalArgumentException(JUST_NUMBER);
+            throw new ServiceException(JUST_NUMBER);
         }
 
         int bookID = Integer.parseInt(bookId);
 
        bookDaoImplementation.findById(bookID)
-                .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
+                .orElseThrow(() -> new ServiceException(BOOK_NOT_EXIST));
 
-        int userID = bookDaoImplementation.findReaderIdByBookId(bookID);
+        Integer userID = bookDaoImplementation.findReaderIdByBookId(bookID);
 
-        if (userID == 0) {
+        if (userID == null) {
             return Optional.empty();
         }
 
         return readerDaoImplementation.findById(userID);
     }
 
-    public List<Book> allBorrowedBookByReaderId(String readerId) throws IllegalArgumentException {
+    public List<Book> allBorrowedBookByReaderId (String readerId) {
         if (!readerId.matches("^\\s*\\d+\\s*$")) {
-            throw new IllegalArgumentException(JUST_NUMBER);
+            throw new ServiceException(JUST_NUMBER);
         }
 
         int readerID = Integer.parseInt(readerId);
 
         readerDaoImplementation.findById(readerID)
-                .orElseThrow(() -> new IllegalArgumentException(READER_NOT_EXIST));
+                .orElseThrow(() -> new ServiceException(READER_NOT_EXIST));
 
         return bookDaoImplementation.findAllByReaderId(readerID);
     }
 
-    public void returnBook(String bookId) throws IllegalArgumentException {
+    public void returnBook(String bookId) {
         if (!bookId.matches("^\\s*\\d+\\s*$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
+            throw new ServiceException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
         }
 
         int bookID = Integer.parseInt(bookId);
 
         bookDaoImplementation.findById(bookID)
-                .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
+                .orElseThrow(() -> new ServiceException(BOOK_NOT_EXIST));
 
         bookDaoImplementation.returnBookToLibrary(bookID);
     }
 
 
 
-    public void borrowBookToReader(String inputBookIDAndReaderID) throws IllegalArgumentException {
+    public void borrowBookToReader (String inputBookIDAndReaderID) {
         if (!inputBookIDAndReaderID.matches("^\\s*(\\d+)(\\s\\/\\s)(\\d+\\s*)$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
+            throw new ServiceException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
         }
 
         String[] bookIdAndAuthorId = inputBookIDAndReaderID.split("/");
@@ -78,29 +78,29 @@ public class LibraryService {
         int readerID = Integer.parseInt(bookIdAndAuthorId[1].trim());
 
         if (bookDaoImplementation.findById(readerID).isEmpty()) {
-            throw new IllegalArgumentException(BOOK_NOT_EXIST);
+            throw new ServiceException(BOOK_NOT_EXIST);
         }
 
         if (readerDaoImplementation.findById(bookID).isEmpty()) {
-            throw new IllegalArgumentException(READER_NOT_EXIST);
+            throw new ServiceException(READER_NOT_EXIST);
         }
 
         bookDaoImplementation.borrowBookToReader(bookID, readerID);
     }
 
 
-    public void addNewBook(String inputNameAndAuthor) throws IllegalArgumentException {
+    public void addNewBook (String inputNameAndAuthor) {
         if (!inputNameAndAuthor.matches("^\\s*\\D([a-zA-Z]+)(\\s\\/\\s)([a-zA-Z]+\\s*)$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_ADD_BOOK);
+            throw new ServiceException(ILLEGAL_ARGUMENT_FOR_ADD_BOOK);
         }
 
         String[] nameAndAuthor = inputNameAndAuthor.split("/");
         bookDaoImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim()));
     }
 
-    public void addNewReader(String fullName) throws IllegalArgumentException {
+    public void addNewReader (String fullName) {
         if (!fullName.matches("^[a-zA-Z]+\\s*[a-zA-Z]+$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_ADD_READER);
+            throw new ServiceException(ILLEGAL_ARGUMENT_FOR_ADD_READER);
         }
 
         readerDaoImplementation.save(new Reader(fullName));

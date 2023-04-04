@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface DaoReaderInterface {
     List<Reader> findAll ();
     Optional<Reader> findById (int id);
-    Optional<Reader> save (Reader readerToSave);
+    Reader save (Reader readerToSave);
 }

@@ -26,8 +26,8 @@ public class DaoReaderImplementation implements DaoReaderInterface{
     }
 
     @Override
-    public Optional<Reader> save(Reader readerToSave) {
+    public Reader save(Reader readerToSave) {
         readers.add(readerToSave);
-        return Optional.of(readerToSave);
+        return readerToSave;
     }
 }

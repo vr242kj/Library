@@ -6,68 +6,67 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
-public class ReaderDaoImplementation implements DaoReaderInterface{
-    //String myConnectionURL = "jdbc:postgresql://localhost:5432/library?user=postgres&password=olimp123";
-    String URL = "jdbc:postgresql://localhost:5432/library";
-    ConnectionUtil connectionUtil = new ConnectionUtil();
-    private final List<Reader> readers = new ArrayList<Reader>();
+public class ReaderDaoImplementation implements DaoReaderInterface {
     @Override
-    public List<Reader> findAll() {
-        readers.clear();
-
+    public List<Reader> findAll () {
         String sql = "select * from reader";
 
-        try (Connection con = DriverManager.getConnection(URL, connectionUtil.propertiesForConnection());
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    readers.add(createReaderFromBD(rs));
+        try (var connection = ConnectionUtil.createConnection();
+             var statement = connection.prepareStatement(sql)) {
+            List<Reader> readers = new ArrayList<Reader>();
+            try (var resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    readers.add(readerMapper(resultSet));
                 }
             }
+            return readers;
         } catch (SQLException e) {
-            System.out.println(e);
+            throw new DAOException("Database error during retrieval of available readers list!" + "\nError details: " + e.getMessage());
         }
-        return readers;
     }
 
     @Override
-    public Optional<Reader> findById(int id) {
+    public Optional<Reader> findById (int id) {
 
         String sql = "select * from reader where id = ?";
 
-        try (Connection con = DriverManager.getConnection(URL, connectionUtil.propertiesForConnection());
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    return Optional.of(createReaderFromBD(rs));
+        try (var connection = ConnectionUtil.createConnection();
+             var statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (var resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    return Optional.of(readerMapper(resultSet));
                 }
             }
+            return Optional.empty();
         } catch (SQLException e) {
-            System.out.println(e);
+            throw new DAOException("Database error during retrieval reader id!" + "\nError details: " + e.getMessage());
         }
-        return Optional.empty();
     }
 
-    private Reader createReaderFromBD (ResultSet rs) throws SQLException {
+    private Reader readerMapper (ResultSet rs) throws SQLException {
         return new Reader(rs.getInt("id"), rs.getString("name"));
     }
 
     @Override
-    public Optional<Reader> save(Reader readerToSave) {
+    public Reader save (Reader readerToSave) {
 
         String sql = "insert into reader(name) values(?)";
-        int readerToSaveId = 0;
 
-        try (Connection con = DriverManager.getConnection(URL, connectionUtil.propertiesForConnection());
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, readerToSave.getName());
-            readerToSaveId = ps.executeUpdate();
+        try (var connection = ConnectionUtil.createConnection();
+             var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, readerToSave.getName());
+            statement.executeUpdate();
+            try(var generatedKeys =  statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    readerToSave.setId(generatedKeys.getInt(1));
+                }
+            }
+            return readerToSave;
+
         } catch (SQLException e) {
-            System.out.println(e);
+            throw new DAOException("Database error during saving new reader!" + "\nError details: " + e.getMessage());
         }
-        return findById(readerToSaveId);
     }
 }

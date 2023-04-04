@@ -33,9 +33,9 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public Optional<Book> save (Book bookToSave) {
+    public Book save (Book bookToSave) {
         books.add(bookToSave);
-        return Optional.of(bookToSave);
+        return bookToSave;
     }
 
     @Override

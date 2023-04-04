@@ -1,8 +1,10 @@
 package ui;
 
+import dao.DAOException;
 import entity.Book;
 import entity.Reader;
 import service.LibraryService;
+import service.ServiceException;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +35,7 @@ public class UserInterface {
         while (true) {
             System.out.println(MENU);
             try {
-                String TRY_AGAIN = "\nTry again (numbers {1, 8} or EXIT)";
-                switch (input.nextLine()) {
+                switch (input.nextLine().toLowerCase()) {
                     case "1" -> printAllBooks();
                     case "2" -> printAllReaders();
                     case "3" -> addNewReader();
@@ -43,11 +44,11 @@ public class UserInterface {
                     case "6" -> returnBookToLibrary();
                     case "7" -> printAllBorrowedBookById();
                     case "8" -> printCurrentReaderOfBookByReaderId();
-                    case "EXIT" -> exitFromProgram();
-                    default -> throw new IllegalArgumentException(TRY_AGAIN);
+                    case "exit" -> exitFromProgram();
+                    default -> throw new UserInputException("Try again (numbers {1, 8} or EXIT)");
                 }
-            } catch (IllegalArgumentException e){
-                System.err.println(e);
+            } catch (ServiceException | DAOException | UserInputException e){
+                System.out.println(e.getMessage());
             }
         }
     }

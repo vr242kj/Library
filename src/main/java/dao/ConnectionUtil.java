@@ -1,29 +1,41 @@
 package dao;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionUtil {
+    private static Properties loadPropertiesFile () {
 
-    public Properties loadPropertiesFile() throws Exception {
+        Properties properties = new Properties();
 
-        Properties prop = new Properties();
-        InputStream in = new FileInputStream("src/main/resources/jdbc.properties");
-        prop.load(in);
-        in.close();
-        return prop;
+        try (InputStream inputStream = new FileInputStream("src/main/resources/jdbc.properties")) {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            System.out.println("Unable to find property file" + "\nError details: " + e.getMessage());
+        }
+        return properties;
     }
 
-    public Properties propertiesForConnection () {
+    public static Connection createConnection () {
 
-        Properties prop = new Properties();
+        Connection connection = null;
+
+        Properties prop = loadPropertiesFile();
+        String url = prop.getProperty("url");
+        String username = prop.getProperty("username");
+        String password = prop.getProperty("password");
+
         try {
-            prop = loadPropertiesFile();
-        } catch (Exception e) {
-            e.printStackTrace();
+            connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            System.out.println("Unable to create connection" + "\nError details: " + e.getMessage());
+            System.exit(0);
         }
-
-        return prop;
+        return connection;
     }
 }
