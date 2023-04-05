@@ -18,36 +18,16 @@ public class Book {
         this.author = author;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getReaderId() {
-        return readerId;
-    }
-
-    public void setReaderId(int readerId) {
-        this.readerId = readerId;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getAuthor() {
         return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     @Override
