@@ -19,7 +19,7 @@ public class LibraryService {
        try{
            bookID = Integer.parseInt(bookId);
        }catch (NumberFormatException e) {
-           throw new ServiceException("book id must be numeric");
+           throw new ServiceException("Book id must be numeric");
        }
 
        daoBookImplementation.findById(bookID)
@@ -27,11 +27,7 @@ public class LibraryService {
 
         Integer readerID = daoBookImplementation.findReaderIdByBookId(bookID);
 
-        if (readerID == null) {
-            return null;
-        }
-
-        return daoReaderImplementation.findById(readerID).get();
+        return daoReaderImplementation.findById(readerID).orElse(null);
     }
 
     public List<Book> allBorrowedBookByReaderId (String readerId) {
@@ -40,7 +36,7 @@ public class LibraryService {
         try{
             readerID = Integer.parseInt(readerId);
         }catch (NumberFormatException e) {
-            throw new ServiceException("reader id must be numeric");
+            throw new ServiceException("Reader id must be numeric");
         }
 
         daoReaderImplementation.findById(readerID)
@@ -55,7 +51,7 @@ public class LibraryService {
         try{
             bookID = Integer.parseInt(bookId);
         }catch (NumberFormatException e) {
-            throw new ServiceException("book id must be numeric");
+            throw new ServiceException("Book id must be numeric");
         }
 
         daoBookImplementation.findById(bookID)
@@ -65,20 +61,16 @@ public class LibraryService {
     }
 
     public void borrowBookToReader (String inputBookIDAndReaderID) {
-        if (!inputBookIDAndReaderID.matches("^\\s*\\w+\\/(\\w+\\s*)$")) {
-            throw new ServiceException("Try again like this: book id/reader id, without spaces between slash");
+        if (!inputBookIDAndReaderID.matches("^\\s*\\d+\\/(\\d+\\s*)$")) {
+            throw new ServiceException("Try again like this: book id/reader id. One slash, without spaces before and after. " +
+                    "Book id and reader id must be numeric");
         }
 
         String[] bookIdAndAuthorId = inputBookIDAndReaderID.split("/");
-        int bookID;
-        int readerID;
 
-        try {
-            bookID = Integer.parseInt(bookIdAndAuthorId[0].trim());
-            readerID = Integer.parseInt(bookIdAndAuthorId[1].trim());
-        } catch (NumberFormatException e) {
-            throw new ServiceException("book id and reade id must be numeric");
-        }
+        int bookID = Integer.parseInt(bookIdAndAuthorId[0].trim());
+        int readerID = Integer.parseInt(bookIdAndAuthorId[1].trim());
+
         if (daoBookImplementation.findById(bookID).isEmpty()) {
             throw new ServiceException("This book id doesn't exist");
         }
@@ -93,7 +85,7 @@ public class LibraryService {
 
     public void addNewBook (String inputNameAndAuthor) {
         if (!inputNameAndAuthor.matches("^[A-Za-z0-9\\s\\-_,\\.;:()]+(\\S\\/)([a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*)$")) {
-            throw new ServiceException("Try again like this: name/author, without spaces between slash. Author must be literal");
+            throw new ServiceException("Try again like this: name/author. One slash, without spaces before and after. Author must be literal");
         }
 
         String[] nameAndAuthor = inputNameAndAuthor.split("/");

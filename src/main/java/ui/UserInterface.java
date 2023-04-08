@@ -51,36 +51,49 @@ public class UserInterface {
     }
 
     private void printAllBooks () {
-        libraryService.findAllBooks().forEach(System.out::println);
+        List<Book> books = libraryService.findAllBooks();
+        if (books.isEmpty()) {
+            System.out.println("There are no books in the library.");
+        } else {
+            books.forEach(System.out::println);
+        }
     }
 
     private void printAllReaders () {
-        libraryService.findAllReaders().forEach(System.out::println);
+        List<Book> readers = libraryService.findAllBooks();
+        if (readers.isEmpty()) {
+            System.out.println("There are no readers in the library.");
+        } else {
+            readers.forEach(System.out::println);
+        }
     }
 
     private void addNewReader () {
         System.out.println("Please enter new reader full name!");
         String fullName = input.nextLine();
         libraryService.addNewReader(fullName);
+        System.out.println("Reader added successfully.");
     }
 
     private void addNewBook () {
-        System.out.println("Please enter new book name and author separated by \"/\". Like this: name/author");
+        System.out.println("Please enter new book name and author separated by \"/\". Like this: name/author.");
         String inputNameAndAuthor = input.nextLine();
         libraryService.addNewBook(inputNameAndAuthor);
+        System.out.println("Book added successfully.");
     }
 
     private void borrowBookToReader () {
-        System.out.println("Please enter new book id and reader id separated by \"/\". Like this: book id/reader id");
+        System.out.println("Please enter new book id and reader id separated by \"/\". Like this: book id/reader id.");
         String inputBookIDAndAuthorID = input.nextLine();
         libraryService.borrowBookToReader(inputBookIDAndAuthorID);
+        System.out.println("Book loaned successfully.");
     }
 
     private void returnBookToLibrary () {
         System.out.println("Write book id:");
         String bookId = input.nextLine();
         libraryService.returnBook(bookId.trim());
-        System.out.println("Book return successful");
+        System.out.println("Book return successfully.");
     }
 
     private void printAllBorrowedBookById () {
@@ -89,7 +102,7 @@ public class UserInterface {
         List<Book> listOfBooks = libraryService.allBorrowedBookByReaderId(readerId.trim());
 
         if (listOfBooks.isEmpty()) {
-            System.out.println("This reader hasn't borrowed the book yet");
+            System.out.println("This reader hasn't borrowed the book yet.");
         } else {
             listOfBooks.forEach(System.out::println);
         }
@@ -101,7 +114,7 @@ public class UserInterface {
         Reader currentReader = libraryService.currentReaderOfBook(bookId.trim());
 
         if (currentReader == null) {
-            System.out.println("This book is in the library");
+            System.out.println("This book is in the library.");
         } else {
             System.out.println(currentReader);
         }
