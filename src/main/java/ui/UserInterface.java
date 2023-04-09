@@ -60,7 +60,7 @@ public class UserInterface {
     }
 
     private void printAllReaders () {
-        List<Book> readers = libraryService.findAllBooks();
+        List<Reader> readers = libraryService.findAllReaders();
         if (readers.isEmpty()) {
             System.out.println("There are no readers in the library.");
         } else {
