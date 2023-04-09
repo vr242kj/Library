@@ -86,7 +86,7 @@ public class UserInterface {
         System.out.println("Please enter new book id and reader id separated by \"/\". Like this: book id/reader id.");
         String inputBookIDAndAuthorID = input.nextLine();
         libraryService.borrowBookToReader(inputBookIDAndAuthorID);
-        System.out.println("Book loaned successfully.");
+        System.out.println("Book borrowed successfully.");
     }
 
     private void returnBookToLibrary () {
