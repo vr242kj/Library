@@ -9,26 +9,28 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionUtil {
-    private static Properties loadPropertiesFile () {
+    private static final Properties properties = loadPropertiesFile();
 
-        Properties properties = new Properties();
+    private static Properties loadPropertiesFile () {
+        Properties prop = new Properties();
 
         try (InputStream inputStream = new FileInputStream("src/main/resources/jdbc.properties")) {
-            properties.load(inputStream);
+            prop.load(inputStream);
+
         } catch (IOException e) {
             System.out.println("Unable to find property file" + "\nError details: " + e.getMessage());
+            System.exit(0);
         }
-        return properties;
+        return prop;
     }
 
     public static Connection createConnection () {
 
         Connection connection = null;
 
-        Properties prop = loadPropertiesFile();
-        String url = prop.getProperty("url");
-        String username = prop.getProperty("username");
-        String password = prop.getProperty("password");
+        String url = properties.getProperty("url");
+        String username = properties.getProperty("name");
+        String password = properties.getProperty("password");
 
         try {
             connection = DriverManager.getConnection(url, username, password);

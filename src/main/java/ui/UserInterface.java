@@ -40,7 +40,7 @@ public class UserInterface {
                     case "5" -> borrowBookToReader();
                     case "6" -> returnBookToLibrary();
                     case "7" -> printAllBorrowedBookById();
-                    case "8" -> printCurrentReaderOfBookByReaderId();
+                    case "8" -> printCurrentReaderOfBookByBookId();
                     case "exit" -> exitFromProgram();
                     default -> throw new UserInputException("Try again (numbers {1, 8} or EXIT)");
                 }
@@ -108,16 +108,15 @@ public class UserInterface {
         }
     }
 
-    private void printCurrentReaderOfBookByReaderId () {
+    private void printCurrentReaderOfBookByBookId () {
         System.out.println("Write book id:");
         String bookId = input.nextLine();
-        Reader currentReader = libraryService.currentReaderOfBook(bookId.trim());
 
-        if (currentReader == null) {
-            System.out.println("This book is in the library.");
-        } else {
-            System.out.println(currentReader);
-        }
+        libraryService.currentReaderOfBook(bookId.trim())
+                .ifPresentOrElse(
+                        System.out::println,
+                        () -> System.out.println("This book is in the library.")
+                );
     }
 
     private void exitFromProgram () {

@@ -1,11 +1,11 @@
 package entity;
 
 public class Reader {
-    private int id;
+    private long id;
     private String name;
 
 
-    public Reader(int id, String name) {
+    public Reader(long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -14,7 +14,7 @@ public class Reader {
         this.name = name;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

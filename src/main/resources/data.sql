@@ -7,3 +7,4 @@ INSERT INTO book(name, author) VALUES
                                    ('In Search of Lost Time', 'Marcel Proust'),
                                    ('Ulysses', 'James Joyce'),
                                    ('Don Quixote', 'Miguel de Cervantes');
+

@@ -15,7 +15,7 @@ public class DaoBookImplementation implements DaoBookInterface {
             List<Book> books = new ArrayList<>();
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    books.add(bookMapper(resultSet));
+                    books.add(mapToBook(resultSet));
                 }
             }
             return books;
@@ -25,13 +25,13 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public Optional<Book> findById (int id) {
+    public Optional<Book> findById (long id) {
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement("select * from book where id = ?")) {
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    return Optional.of(bookMapper(resultSet));
+                    return Optional.of(mapToBook(resultSet));
                 }
             }
             return Optional.empty();
@@ -41,14 +41,14 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public List<Book> findAllByReaderId (int readerId) {
+    public List<Book> findAllByReaderId (long readerId) {
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement("select * from book where readerId = ?")) {
-            statement.setInt(1, readerId);
+            statement.setLong(1, readerId);
             List<Book> books = new ArrayList<>();
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    books.add(bookMapper(resultSet));
+                    books.add(mapToBook(resultSet));
                 }
             }
             return books;
@@ -57,8 +57,12 @@ public class DaoBookImplementation implements DaoBookInterface {
         }
     }
 
-    private Book bookMapper (ResultSet rs) throws SQLException {
-        return new Book(rs.getInt("id"), rs.getString("name"), rs.getString("author"), rs.getInt("readerId"));
+    private Book mapToBook(ResultSet rs) {
+        try {
+            return new Book(rs.getInt("id"), rs.getString("name"), rs.getString("author"), rs.getInt("readerId"));
+        } catch (SQLException e) {
+            throw new DAOException("Failed to map resultSet to Book object!" + "\nError details: " + e.getMessage());
+        }
     }
 
     @Override
@@ -82,11 +86,11 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public void borrowBookToReader (int bookId, int readerId) {
+    public void borrowBookToReader (long bookId, long readerId) {
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement("update book set readerId = ? where id = ?")) {
-            statement.setInt(1, readerId);
-            statement.setInt(2, bookId);
+            statement.setLong(1, readerId);
+            statement.setLong(2, bookId);
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Database error, statement cannot be executed!" + "\nError details: " + e.getMessage());
@@ -94,29 +98,13 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
 
     @Override
-    public void returnBookToLibrary (int bookId) {
+    public void returnBookToLibrary (long bookId) {
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement("update book set readerId = null where id = ?")) {
             statement.setLong(1, bookId);
             statement.executeUpdate();
         }catch (SQLException e){
             throw new DAOException("Database error, statement cannot be executed!" + "\nError details: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public Integer findReaderIdByBookId (int bookId) {
-        try (var connection = ConnectionUtil.createConnection();
-             var statement = connection.prepareStatement("select readerId from book where id = ?")) {
-            statement.setInt(1, bookId);
-            try (var resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    return resultSet.getInt("readerId");
-                }
-            }
-            return null;
-        } catch (SQLException e) {
-            throw new DAOException("Database error during retrieval reader by book Id!" + "\nError details: " + e.getMessage());
         }
     }
 }

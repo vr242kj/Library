@@ -1,5 +1,6 @@
 package dao;
 
+import entity.Book;
 import entity.Reader;
 
 import java.sql.*;
@@ -15,7 +16,7 @@ public class DaoReaderImplementation implements DaoReaderInterface {
             List<Reader> readers = new ArrayList<Reader>();
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    readers.add(readerMapper(resultSet));
+                    readers.add(mapToReader(resultSet));
                 }
             }
             return readers;
@@ -25,13 +26,13 @@ public class DaoReaderImplementation implements DaoReaderInterface {
     }
 
     @Override
-    public Optional<Reader> findById (int id) {
+    public Optional<Reader> findById (long id) {
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement("select * from reader where id = ?")) {
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    return Optional.of(readerMapper(resultSet));
+                    return Optional.of(mapToReader(resultSet));
                 }
             }
             return Optional.empty();
@@ -40,8 +41,12 @@ public class DaoReaderImplementation implements DaoReaderInterface {
         }
     }
 
-    private Reader readerMapper (ResultSet rs) throws SQLException {
-        return new Reader(rs.getInt("id"), rs.getString("name"));
+    private Reader mapToReader (ResultSet rs) {
+        try {
+            return new Reader(rs.getInt("id"), rs.getString("name"));
+        } catch (SQLException e) {
+            throw new DAOException("Failed to map resultSet to Reader object!" + "\nError details: " + e.getMessage());
+        }
     }
 
     @Override
@@ -60,6 +65,22 @@ public class DaoReaderImplementation implements DaoReaderInterface {
             }
         } catch (SQLException e) {
             throw new DAOException("Database error during saving new reader!" + "\nError details: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Optional<Reader> findByBookId(long bookId) {
+        try (var connection = ConnectionUtil.createConnection();
+             var statement = connection.prepareStatement("select reader.id, reader.name from reader inner join book on reader.id = book.readerid where book.id = ?")) {
+            statement.setLong(1, bookId);
+            try (var resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    return Optional.of(mapToReader(resultSet));
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new DAOException("Database error during retrieval reader by book Id!" + "\nError details: " + e.getMessage());
         }
     }
 }

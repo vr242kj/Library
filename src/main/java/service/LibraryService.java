@@ -8,56 +8,45 @@ import entity.Book;
 import entity.Reader;
 
 import java.util.List;
+import java.util.Optional;
 
 public class LibraryService {
     private final DaoBookInterface daoBookImplementation = new DaoBookImplementation();
     private final DaoReaderInterface daoReaderImplementation = new DaoReaderImplementation();
 
-   public Reader currentReaderOfBook (String bookId) {
-       int bookID;
+    private long convertStringToLong (String id) {
+        try{
+            return Long.parseLong(id);
+        }catch (NumberFormatException e) {
+            throw new ServiceException("Id must be numeric");
+        }
+    }
 
-       try{
-           bookID = Integer.parseInt(bookId);
-       }catch (NumberFormatException e) {
-           throw new ServiceException("Book id must be numeric");
-       }
+   public Optional<Reader> currentReaderOfBook (String bookId) {
+       long bookIdNumeric = convertStringToLong(bookId);
 
-       daoBookImplementation.findById(bookID)
+       daoBookImplementation.findById(bookIdNumeric)
                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
 
-        Integer readerID = daoBookImplementation.findReaderIdByBookId(bookID);
-
-        return daoReaderImplementation.findById(readerID).orElse(null);
+       return daoReaderImplementation.findByBookId(bookIdNumeric);
     }
 
     public List<Book> allBorrowedBookByReaderId (String readerId) {
-        int readerID;
+        long readerIdNumeric = convertStringToLong(readerId);
 
-        try{
-            readerID = Integer.parseInt(readerId);
-        }catch (NumberFormatException e) {
-            throw new ServiceException("Reader id must be numeric");
-        }
-
-        daoReaderImplementation.findById(readerID)
+        daoReaderImplementation.findById(readerIdNumeric)
                 .orElseThrow(() -> new ServiceException("This reader id doesn't exist"));
 
-        return daoBookImplementation.findAllByReaderId(readerID);
+        return daoBookImplementation.findAllByReaderId(readerIdNumeric);
     }
 
     public void returnBook (String bookId) {
-        int bookID;
+        long bookIdNumeric = convertStringToLong(bookId);
 
-        try{
-            bookID = Integer.parseInt(bookId);
-        }catch (NumberFormatException e) {
-            throw new ServiceException("Book id must be numeric");
-        }
-
-        daoBookImplementation.findById(bookID)
+        daoBookImplementation.findById(bookIdNumeric)
                 .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
 
-        daoBookImplementation.returnBookToLibrary(bookID);
+        daoBookImplementation.returnBookToLibrary(bookIdNumeric);
     }
 
     public void borrowBookToReader (String inputBookIDAndReaderID) {
@@ -66,20 +55,20 @@ public class LibraryService {
                     "Book id and reader id must be numeric");
         }
 
-        String[] bookIdAndAuthorId = inputBookIDAndReaderID.split("/");
+        String[] bookIdAndReaderId = inputBookIDAndReaderID.split("/");
 
-        int bookID = Integer.parseInt(bookIdAndAuthorId[0].trim());
-        int readerID = Integer.parseInt(bookIdAndAuthorId[1].trim());
+        long bookIdNumeric = convertStringToLong(bookIdAndReaderId[0].trim());
+        long readerIdNumeric = convertStringToLong(bookIdAndReaderId[1].trim());
 
-        if (daoBookImplementation.findById(bookID).isEmpty()) {
+        if (daoBookImplementation.findById(bookIdNumeric).isEmpty()) {
             throw new ServiceException("This book id doesn't exist");
         }
 
-        if (daoReaderImplementation.findById(readerID).isEmpty()) {
+        if (daoReaderImplementation.findById(readerIdNumeric).isEmpty()) {
             throw new ServiceException("This reader id doesn't exist");
         }
 
-        daoBookImplementation.borrowBookToReader(bookID, readerID);
+        daoBookImplementation.borrowBookToReader(bookIdNumeric, readerIdNumeric);
     }
 
 
