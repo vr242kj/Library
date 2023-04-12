@@ -4,9 +4,7 @@ import entity.Book;
 import entity.Reader;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DaoReaderImplementation implements DaoReaderInterface {
     @Override
@@ -83,4 +81,20 @@ public class DaoReaderImplementation implements DaoReaderInterface {
             throw new DAOException("Database error during retrieval reader by book Id!" + "\nError details: " + e.getMessage());
         }
     }
+    public Map<Reader, Optional<Book>> findAllWithBooks () {
+        try (var connection = ConnectionUtil.createConnection();
+             var statement = connection.prepareStatement("select reader.id, reader.name, book.id from reader inner join book on reader.id = book.readerid order by reader.id")) {
+            Map<Reader, Optional<Book>> map = new HashMap<>();
+            DaoBookImplementation daoBookImplementation = new DaoBookImplementation();
+            try (var resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    map.put(mapToReader(resultSet), daoBookImplementation.findById(resultSet.getLong(3)));
+                }
+            }
+            return map;
+        } catch (SQLException e) {
+            throw new DAOException("Database error during retrieval of available readers with borrowed books list!" + "\nError details: " + e.getMessage());
+        }
+    }
+
 }

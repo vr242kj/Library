@@ -8,19 +8,12 @@ import entity.Book;
 import entity.Reader;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class LibraryService {
     private final DaoBookInterface daoBookImplementation = new DaoBookImplementation();
     private final DaoReaderInterface daoReaderImplementation = new DaoReaderImplementation();
-
-    private long convertStringToLong (String id) {
-        try{
-            return Long.parseLong(id);
-        }catch (NumberFormatException e) {
-            throw new ServiceException("Id must be numeric");
-        }
-    }
 
    public Optional<Reader> currentReaderOfBook (String bookId) {
        long bookIdNumeric = convertStringToLong(bookId);
@@ -95,5 +88,21 @@ public class LibraryService {
 
     public List<Reader> findAllReaders () {
         return daoReaderImplementation.findAll();
+    }
+
+    public Map<Reader, Optional<Book>> findAllReadersWithBorrowedBooks () {
+        return daoReaderImplementation.findAllWithBooks();
+    }
+
+    public Map<Book, Optional<Reader>> findAllBooksWithReaders () {
+        return daoBookImplementation.findAllWithReaders();
+    }
+
+    private long convertStringToLong (String id) {
+        try{
+            return Long.parseLong(id);
+        }catch (NumberFormatException e) {
+            throw new ServiceException("Id must be numeric");
+        }
     }
 }

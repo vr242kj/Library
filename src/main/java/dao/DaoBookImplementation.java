@@ -1,11 +1,10 @@
 package dao;
 
 import entity.Book;
+import entity.Reader;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class DaoBookImplementation implements DaoBookInterface {
     @Override
@@ -105,6 +104,22 @@ public class DaoBookImplementation implements DaoBookInterface {
             statement.executeUpdate();
         }catch (SQLException e){
             throw new DAOException("Database error, statement cannot be executed!" + "\nError details: " + e.getMessage());
+        }
+    }
+    @Override
+    public Map<Book, Optional<Reader>> findAllWithReaders() {
+        try (var connection = ConnectionUtil.createConnection();
+             var statement = connection.prepareStatement("select book.id, book.name, book.author, book.readerId from book left join reader on book.readerId = reader.id order by book.id")) {
+            Map<Book, Optional<Reader>> map = new HashMap<>();
+            DaoReaderImplementation daoReaderImplementation = new DaoReaderImplementation();
+            try (var resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    map.put(mapToBook(resultSet), daoReaderImplementation.findById(resultSet.getLong("readerId")));
+                }
+            }
+            return map;
+        } catch (SQLException e) {
+            throw new DAOException("Database error during retrieval of available books with readers list!" + "\nError details: " + e.getMessage());
         }
     }
 }

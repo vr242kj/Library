@@ -1,13 +1,13 @@
 package ui;
 
+import dao.ConnectionUtil;
 import dao.DAOException;
 import entity.Book;
 import entity.Reader;
 import service.LibraryService;
 import service.ServiceException;
 
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class UserInterface {
     private final LibraryService libraryService = new LibraryService();
@@ -28,6 +28,8 @@ public class UserInterface {
             \t[6]RETURN A BOOK TO THE LIBRARY
             \t[7]SHOW ALL BORROWED BOOK BY READER ID
             \t[8]SHOW CURRENT READER OF A BOOK WITH ID
+            \t[9]SHOW ALL READERS WITH THEIR BORROWED BOOKS
+            \t[10]SHOW ALL BOOKS WITH READERS            
                         
             TYPE “EXIT” TO STOP THE PROGRAM AND EXIT!""");
 
@@ -41,8 +43,10 @@ public class UserInterface {
                     case "6" -> returnBookToLibrary();
                     case "7" -> printAllBorrowedBookById();
                     case "8" -> printCurrentReaderOfBookByBookId();
+                    case "9" -> printAllReadersWithBorrowedBooks();
+                    case "10" -> printAllBooksWithReaders();
                     case "exit" -> exitFromProgram();
-                    default -> throw new UserInputException("Try again (numbers {1, 8} or EXIT)");
+                    default -> throw new UserInputException("Try again (numbers {1, 10} or EXIT)");
                 }
             } catch (ServiceException | DAOException | UserInputException e){
                 System.out.println(e.getMessage());
@@ -117,6 +121,25 @@ public class UserInterface {
                         System.out::println,
                         () -> System.out.println("This book is in the library.")
                 );
+    }
+    private void printAllReadersWithBorrowedBooks() {
+        Map<Reader, Optional<Book>> allReadersWithBorrowedBooks = libraryService.findAllReadersWithBorrowedBooks();
+        if (allReadersWithBorrowedBooks.isEmpty()) {
+            System.out.println("There are no books borrowed.");
+        } else {
+            allReadersWithBorrowedBooks.forEach((key, value) -> System.out.println(key + " : " + value.orElse(null)));
+        }
+    }
+
+    private void printAllBooksWithReaders() {
+        libraryService.findAllBooksWithReaders().forEach(
+                (key, value) -> {
+                    if (value.isEmpty()) {
+                        System.out.println(key + " : available");
+                    } else {
+                        System.out.println(key + " : " + value.get());
+                    }
+                });
     }
 
     private void exitFromProgram () {
