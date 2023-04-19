@@ -1,9 +1,9 @@
 package service;
 
-import dao.DaoBookImplementation;
-import dao.DaoBookInterface;
-import dao.DaoReaderInterface;
-import dao.DaoReaderImplementation;
+import dao.BookDaoJdbcImpl;
+import dao.BookDaoJdbcInterface;
+import dao.ReaderDaoJdbcInterface;
+import dao.ReaderDaoJdbcImpl;
 import entity.Book;
 import entity.Reader;
 
@@ -12,34 +12,34 @@ import java.util.Map;
 import java.util.Optional;
 
 public class LibraryService {
-    private final DaoBookInterface daoBookImplementation = new DaoBookImplementation();
-    private final DaoReaderInterface daoReaderImplementation = new DaoReaderImplementation();
+    private final BookDaoJdbcInterface bookDaoJdbcImpl = new BookDaoJdbcImpl();
+    private final ReaderDaoJdbcInterface readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
 
-   public Optional<Reader> currentReaderOfBook (String bookId) {
-       long bookIdNumeric = convertStringToLong(bookId);
+    public Optional<Reader> currentReaderOfBook (String bookId) {
+        long bookIdNumeric = convertStringToLong(bookId);
 
-       daoBookImplementation.findById(bookIdNumeric)
-               .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
+        bookDaoJdbcImpl.findById(bookIdNumeric)
+                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
 
-       return daoReaderImplementation.findByBookId(bookIdNumeric);
+        return readerDaoJdbcImpl.findByBookId(bookIdNumeric);
     }
 
     public List<Book> allBorrowedBookByReaderId (String readerId) {
         long readerIdNumeric = convertStringToLong(readerId);
 
-        daoReaderImplementation.findById(readerIdNumeric)
+        readerDaoJdbcImpl.findById(readerIdNumeric)
                 .orElseThrow(() -> new ServiceException("This reader id doesn't exist"));
 
-        return daoBookImplementation.findAllByReaderId(readerIdNumeric);
+        return bookDaoJdbcImpl.findAllByReaderId(readerIdNumeric);
     }
 
     public void returnBook (String bookId) {
         long bookIdNumeric = convertStringToLong(bookId);
 
-        daoBookImplementation.findById(bookIdNumeric)
+        bookDaoJdbcImpl.findById(bookIdNumeric)
                 .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
 
-        daoBookImplementation.returnBookToLibrary(bookIdNumeric);
+        bookDaoJdbcImpl.returnBookToLibrary(bookIdNumeric);
     }
 
     public void borrowBookToReader (String inputBookIDAndReaderID) {
@@ -53,15 +53,15 @@ public class LibraryService {
         long bookIdNumeric = convertStringToLong(bookIdAndReaderId[0].trim());
         long readerIdNumeric = convertStringToLong(bookIdAndReaderId[1].trim());
 
-        if (daoBookImplementation.findById(bookIdNumeric).isEmpty()) {
+        if (bookDaoJdbcImpl.findById(bookIdNumeric).isEmpty()) {
             throw new ServiceException("This book id doesn't exist");
         }
 
-        if (daoReaderImplementation.findById(readerIdNumeric).isEmpty()) {
+        if (readerDaoJdbcImpl.findById(readerIdNumeric).isEmpty()) {
             throw new ServiceException("This reader id doesn't exist");
         }
 
-        daoBookImplementation.borrowBookToReader(bookIdNumeric, readerIdNumeric);
+        bookDaoJdbcImpl.borrowBookToReader(bookIdNumeric, readerIdNumeric);
     }
 
 
@@ -71,7 +71,7 @@ public class LibraryService {
         }
 
         String[] nameAndAuthor = inputNameAndAuthor.split("/");
-        daoBookImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim()));
+        bookDaoJdbcImpl.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim()));
     }
 
     public void addNewReader (String fullName) {
@@ -79,23 +79,23 @@ public class LibraryService {
             throw new ServiceException("Full name must be literal and one space between words (max 3 words)");
         }
 
-        daoReaderImplementation.save(new Reader(fullName));
+        readerDaoJdbcImpl.save(new Reader(fullName));
     }
 
     public List<Book> findAllBooks () {
-        return daoBookImplementation.findAll();
+        return bookDaoJdbcImpl.findAll();
     }
 
     public List<Reader> findAllReaders () {
-        return daoReaderImplementation.findAll();
+        return readerDaoJdbcImpl.findAll();
     }
 
-    public Map<Reader, Optional<Book>> findAllReadersWithBorrowedBooks () {
-        return daoReaderImplementation.findAllWithBooks();
+    public Map<Reader, List<Book>> findAllReadersWithBorrowedBooks () {
+        return readerDaoJdbcImpl.findAllWithBooks();
     }
 
     public Map<Book, Optional<Reader>> findAllBooksWithReaders () {
-        return daoBookImplementation.findAllWithReaders();
+        return bookDaoJdbcImpl.findAllWithReaders();
     }
 
     private long convertStringToLong (String id) {

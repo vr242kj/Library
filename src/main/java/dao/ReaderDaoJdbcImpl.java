@@ -6,7 +6,7 @@ import entity.Reader;
 import java.sql.*;
 import java.util.*;
 
-public class DaoReaderImplementation implements DaoReaderInterface {
+public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
     @Override
     public List<Reader> findAll () {
         try (var connection = ConnectionUtil.createConnection();
@@ -29,7 +29,7 @@ public class DaoReaderImplementation implements DaoReaderInterface {
              var statement = connection.prepareStatement("select * from reader where id = ?")) {
             statement.setLong(1, id);
             try (var resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     return Optional.of(mapToReader(resultSet));
                 }
             }
@@ -72,7 +72,7 @@ public class DaoReaderImplementation implements DaoReaderInterface {
              var statement = connection.prepareStatement("select reader.id, reader.name from reader inner join book on reader.id = book.readerid where book.id = ?")) {
             statement.setLong(1, bookId);
             try (var resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     return Optional.of(mapToReader(resultSet));
                 }
             }
@@ -81,14 +81,27 @@ public class DaoReaderImplementation implements DaoReaderInterface {
             throw new DAOException("Database error during retrieval reader by book Id!" + "\nError details: " + e.getMessage());
         }
     }
-    public Map<Reader, Optional<Book>> findAllWithBooks () {
+    public Map<Reader, List<Book>> findAllWithBooks () {
+        var query = """
+                select
+                    reader.id,
+                    reader.name,
+                    book.id as bookId,
+                    book.name as bookName,
+                    book.author as bookAuthor
+                from reader
+                    inner join book on reader.id = book.readerid
+                order by reader.id
+                """;
         try (var connection = ConnectionUtil.createConnection();
-             var statement = connection.prepareStatement("select reader.id, reader.name, book.id from reader inner join book on reader.id = book.readerid order by reader.id")) {
-            Map<Reader, Optional<Book>> map = new HashMap<>();
-            DaoBookImplementation daoBookImplementation = new DaoBookImplementation();
+             var statement = connection.prepareStatement(query)) {
+            Map<Reader, List<Book>> map = new HashMap<>();
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    map.put(mapToReader(resultSet), daoBookImplementation.findById(resultSet.getLong(3)));
+                    if (!map.containsKey(mapToReader(resultSet))) {
+                        map.put(mapToReader(resultSet), new ArrayList<>());
+                    }
+                    map.get(mapToReader(resultSet)).add(new Book(resultSet.getLong("bookId"), resultSet.getString("bookName"), resultSet.getString("bookAuthor")));
                 }
             }
             return map;

@@ -13,13 +13,25 @@ public class Book {
         this.readerId = readerId;
     }
 
-   public Book(String name, String author) {
+    public Book(long id, String name, String author) {
+        this.id = id;
+        this.name = name;
+        this.author = author;
+    }
+
+    public Book(String name, String author) {
         this.name = name;
         this.author = author;
     }
 
     public void setId(long id) {
-        this.id = id;
+        if (this.id == 0) {
+            this.id = id;
+        }
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -32,11 +44,15 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book{" +
+        return this.readerId == 0 ? "Book{" +
                 "id = " + id +
                 ", name = '" + name + '\'' +
-                ", author = '" + author + '\'' +
-                ", readerId = " + readerId +
-                '}';
+                ", author = '" + author + '}' :
+                "Book{" +
+                        "id = " + id +
+                        ", name = '" + name + '\'' +
+                        ", author = '" + author + '\'' +
+                        ", readerId = " + readerId +
+                        '}';
     }
 }

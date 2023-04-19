@@ -1,6 +1,5 @@
 package ui;
 
-import dao.ConnectionUtil;
 import dao.DAOException;
 import entity.Book;
 import entity.Reader;
@@ -123,23 +122,22 @@ public class UserInterface {
                 );
     }
     private void printAllReadersWithBorrowedBooks() {
-        Map<Reader, Optional<Book>> allReadersWithBorrowedBooks = libraryService.findAllReadersWithBorrowedBooks();
+        Map<Reader, List<Book>> allReadersWithBorrowedBooks = libraryService.findAllReadersWithBorrowedBooks();
         if (allReadersWithBorrowedBooks.isEmpty()) {
             System.out.println("There are no books borrowed.");
         } else {
-            allReadersWithBorrowedBooks.forEach((key, value) -> System.out.println(key + " : " + value.orElse(null)));
+            allReadersWithBorrowedBooks.forEach((key, value) -> System.out.println(key + " : " + value));
         }
     }
 
     private void printAllBooksWithReaders() {
         libraryService.findAllBooksWithReaders().forEach(
-                (key, value) -> {
-                    if (value.isEmpty()) {
-                        System.out.println(key + " : available");
-                    } else {
-                        System.out.println(key + " : " + value.get());
-                    }
-                });
+                (key, value) ->
+                        value.ifPresentOrElse(
+                                reader -> System.out.println(key + " : " + reader),
+                                () -> System.out.println(key + " : available")
+                        )
+        );
     }
 
     private void exitFromProgram () {

@@ -6,7 +6,7 @@ import entity.Reader;
 import java.sql.*;
 import java.util.*;
 
-public class DaoBookImplementation implements DaoBookInterface {
+public class BookDaoJdbcImpl implements BookDaoJdbcInterface {
     @Override
     public List<Book> findAll () {
         try (var connection = ConnectionUtil.createConnection();
@@ -29,7 +29,7 @@ public class DaoBookImplementation implements DaoBookInterface {
              var statement = connection.prepareStatement("select * from book where id = ?")) {
             statement.setLong(1, id);
             try (var resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     return Optional.of(mapToBook(resultSet));
                 }
             }
@@ -58,7 +58,10 @@ public class DaoBookImplementation implements DaoBookInterface {
 
     private Book mapToBook(ResultSet rs) {
         try {
-            return new Book(rs.getInt("id"), rs.getString("name"), rs.getString("author"), rs.getInt("readerId"));
+            return rs.getInt("readerId") == 0 ? new Book(rs.getInt("id"), rs.getString("name"),
+                    rs.getString("author")) :
+                    new Book(rs.getInt("id"), rs.getString("name"),
+                            rs.getString("author"), rs.getInt("readerId"));
         } catch (SQLException e) {
             throw new DAOException("Failed to map resultSet to Book object!" + "\nError details: " + e.getMessage());
         }
@@ -73,8 +76,8 @@ public class DaoBookImplementation implements DaoBookInterface {
             statement.executeUpdate();
             try(var generatedKeys =  statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                        bookToSave.setId(generatedKeys.getInt(1));
-                        return bookToSave;
+                    bookToSave.setId(generatedKeys.getInt(1));
+                    return bookToSave;
                 } else {
                     throw new DAOException("Creating book failed, no ID obtained!");
                 }
@@ -108,13 +111,27 @@ public class DaoBookImplementation implements DaoBookInterface {
     }
     @Override
     public Map<Book, Optional<Reader>> findAllWithReaders() {
+        var query = """
+                select
+                    book.id,
+                    book.name,
+                    book.author,
+                    book.readerId,
+                    reader.name as readerName
+                from book
+                    left join reader on book.readerId = reader.id
+                order by book.id
+                """;
         try (var connection = ConnectionUtil.createConnection();
-             var statement = connection.prepareStatement("select book.id, book.name, book.author, book.readerId from book left join reader on book.readerId = reader.id order by book.id")) {
+             var statement = connection.prepareStatement(query)) {
             Map<Book, Optional<Reader>> map = new HashMap<>();
-            DaoReaderImplementation daoReaderImplementation = new DaoReaderImplementation();
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    map.put(mapToBook(resultSet), daoReaderImplementation.findById(resultSet.getLong("readerId")));
+                    if (resultSet.getString("readerName") == null) {
+                        map.put(mapToBook(resultSet), Optional.empty());
+                    } else {
+                        map.put(mapToBook(resultSet), Optional.of(new Reader(resultSet.getString("readerName"))));
+                    }
                 }
             }
             return map;

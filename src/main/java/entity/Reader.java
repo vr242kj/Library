@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.Objects;
+
 public class Reader {
     private long id;
     private String name;
@@ -15,7 +17,13 @@ public class Reader {
     }
 
     public void setId(long id) {
-        this.id = id;
+        if (this.id == 0) {
+            this.id = id;
+        }
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -23,10 +31,24 @@ public class Reader {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reader reader = (Reader) o;
+        return id == reader.id && Objects.equals(name, reader.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
     public String toString() {
-        return "Reader{" +
-                "id = " + id +
-                ", name = " + name +
-                '}';
+        return this.id == 0 ? "Reader{name = " + name + '}' :
+                "Reader{" +
+                        "id = " + id +
+                        ", name = " + name +
+                        '}';
     }
 }

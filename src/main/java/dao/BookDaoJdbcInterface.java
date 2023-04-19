@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface DaoBookInterface {
+public interface BookDaoJdbcInterface {
     List<Book> findAll ();
     Optional<Book> findById (long id);
     List<Book> findAllByReaderId (long readerId);
