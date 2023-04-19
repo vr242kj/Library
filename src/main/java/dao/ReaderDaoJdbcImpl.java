@@ -91,11 +91,11 @@ public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
                     book.author as bookAuthor
                 from reader
                     inner join book on reader.id = book.readerid
-                order by reader.id
+                order by reader.id, bookId;
                 """;
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement(query)) {
-            Map<Reader, List<Book>> map = new HashMap<>();
+            Map<Reader, List<Book>> map = new LinkedHashMap<>();
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     if (!map.containsKey(mapToReader(resultSet))) {
@@ -109,5 +109,4 @@ public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
             throw new DAOException("Database error during retrieval of available readers with borrowed books list!" + "\nError details: " + e.getMessage());
         }
     }
-
 }
