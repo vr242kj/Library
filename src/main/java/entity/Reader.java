@@ -2,7 +2,7 @@ package entity;
 
 import java.util.Objects;
 
-public class Reader {
+public class Reader  {
     private long id;
     private String name;
 

@@ -120,11 +120,10 @@ public class BookDaoJdbcImpl implements BookDaoJdbcInterface {
                     reader.name as readerName
                 from book
                     left join reader on book.readerId = reader.id
-                order by book.readerId NULLS LAST, book.id;
                 """;
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement(query)) {
-            Map<Book, Optional<Reader>> map = new LinkedHashMap<>();
+            Map<Book, Optional<Reader>> map = new TreeMap<>(Comparator.comparing(Book::getId));
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     if (resultSet.getString("readerName") == null) {
@@ -134,6 +133,7 @@ public class BookDaoJdbcImpl implements BookDaoJdbcInterface {
                     }
                 }
             }
+
             return map;
         } catch (SQLException e) {
             throw new DAOException("Database error during retrieval of available books with readers list!" + "\nError details: " + e.getMessage());

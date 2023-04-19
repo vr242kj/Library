@@ -91,11 +91,10 @@ public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
                     book.author as bookAuthor
                 from reader
                     inner join book on reader.id = book.readerid
-                order by reader.id, bookId;
                 """;
         try (var connection = ConnectionUtil.createConnection();
              var statement = connection.prepareStatement(query)) {
-            Map<Reader, List<Book>> map = new LinkedHashMap<>();
+            Map<Reader, List<Book>> map = new TreeMap<>(Comparator.comparing(Reader::getId));
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     if (!map.containsKey(mapToReader(resultSet))) {
