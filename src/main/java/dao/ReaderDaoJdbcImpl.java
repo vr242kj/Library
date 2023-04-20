@@ -5,7 +5,6 @@ import entity.Reader;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReaderDaoJdbcImpl implements ReaderDao {
@@ -41,9 +40,12 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
         }
     }
 
-    private Reader mapToReader (ResultSet rs) {
+    private Reader mapToReader(ResultSet rs) {
         try {
-            return new Reader(rs.getInt("id"), rs.getString("name"));
+            return new Reader(
+                    rs.getInt("id"),
+                    rs.getString("name")
+            );
         } catch (SQLException e) {
             throw new DAOException("Failed to map resultSet to Reader object!" + "\nError details: " + e.getMessage());
         }
@@ -100,10 +102,17 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
             Map<Reader, List<Book>> map = new TreeMap<>(Comparator.comparing(Reader::getId));
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    map.merge(mapToReader(resultSet), List.of(new Book(resultSet.getLong("bookId"), resultSet.getString("bookName"),
-                            resultSet.getString("bookAuthor"))), (oldValue, newValue) -> Stream
-                            .concat(oldValue.stream(), newValue.stream())
-                            .toList()
+                    var book = new Book(
+                            resultSet.getLong("bookId"),
+                            resultSet.getString("bookName"),
+                            resultSet.getString("bookAuthor")
+                    );
+                    map.merge(
+                            mapToReader(resultSet),
+                            List.of(book),
+                            (addedBooks, newBooks) -> Stream
+                                .concat(addedBooks.stream(), newBooks.stream())
+                                .toList()
                     );
                 }
             }

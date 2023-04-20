@@ -58,8 +58,12 @@ public class BookDaoJdbcImpl implements BookDao {
 
     private Book mapToBook(ResultSet rs) {
         try {
-            return new Book(rs.getInt("id"), rs.getString("name"),
-                            rs.getString("author"), rs.getInt("readerId"));
+            return new Book(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("author"),
+                    rs.getInt("readerId")
+            );
         } catch (SQLException e) {
             throw new DAOException("Failed to map resultSet to Book object!" + "\nError details: " + e.getMessage());
         }
