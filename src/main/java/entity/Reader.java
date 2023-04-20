@@ -1,16 +1,25 @@
 package entity;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Objects;
 
-public class Reader {
+public class Reader  {
     private long id;
     private String name;
 
-    private static AtomicLong count = new AtomicLong(0);
+
+    public Reader(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Reader(String name) {
-        this.id = count.incrementAndGet();
         this.name = name;
+    }
+
+    public void setId(long id) {
+        if (this.id == 0) {
+            this.id = id;
+        }
     }
 
     public long getId() {
@@ -21,15 +30,25 @@ public class Reader {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reader reader = (Reader) o;
+        return id == reader.id && Objects.equals(name, reader.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
-        return "Reader{" +
-                "id = " + id +
-                " , name = " + name +
-                '}';
+        return this.id == 0 ? "Reader{name = " + name + '}' :
+                "Reader{" +
+                        "id = " + id +
+                        ", name = " + name +
+                        '}';
     }
 }

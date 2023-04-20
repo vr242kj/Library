@@ -1,116 +1,108 @@
 package service;
 
-import dao.DaoBookImplementation;
-import dao.DaoReaderImplementation;
+import dao.BookDaoJdbcImpl;
+import dao.BookDao;
+import dao.ReaderDao;
+import dao.ReaderDaoJdbcImpl;
 import entity.Book;
 import entity.Reader;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class LibraryService {
+    private final BookDao bookDaoJdbcImpl = new BookDaoJdbcImpl();
+    private final ReaderDao readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
 
-    private final String JUST_NUMBER = "\nInput must be numeric";
-    private final String ILLEGAL_ARGUMENT_FOR_RETURN_BOOK = "Book ID must be numeric";
-    private final String ILLEGAL_ARGUMENT_FOR_ADD_BOOK = "Try again like this: name / author";
-    private final String ILLEGAL_ARGUMENT_FOR_ADD_READER = "Full name must be literal";
+    public Optional<Reader> currentReaderOfBook (String bookId) {
+        long bookIdNumeric = convertStringToLong(bookId);
 
-    private final String BOOK_NOT_EXIST = "This book id doesn't exist";
-    private final String READER_NOT_EXIST = "This reader id doesn't exist";
+        bookDaoJdbcImpl.findById(bookIdNumeric)
+                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
 
-    private final DaoBookImplementation daoBookImplementation = new DaoBookImplementation();
-    private final DaoReaderImplementation daoReaderImplementation = new DaoReaderImplementation();
-
-    public Optional<Reader> currentReaderOfBook(String bookId) throws IllegalArgumentException {
-        if (!bookId.matches("^\\s*\\d+\\s*$")) {
-            throw new IllegalArgumentException(JUST_NUMBER);
-        }
-
-        long bookID = Long.parseLong(bookId);
-
-        daoBookImplementation.findById(bookID)
-                .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
-
-        long userID = daoBookImplementation.findReaderIdByBookId(bookID);
-
-        if (userID == 0L) {
-            return Optional.empty();
-        }
-
-        return daoReaderImplementation.findById(userID);
+        return readerDaoJdbcImpl.findByBookId(bookIdNumeric);
     }
 
-    public List<Book> allBorrowedBookByReaderId(String readerId) throws IllegalArgumentException {
-        if (!readerId.matches("^\\s*\\d+\\s*$")) {
-            throw new IllegalArgumentException(JUST_NUMBER);
-        }
+    public List<Book> allBorrowedBookByReaderId (String readerId) {
+        long readerIdNumeric = convertStringToLong(readerId);
 
-        long readerID = Long.parseLong(readerId);
+        readerDaoJdbcImpl.findById(readerIdNumeric)
+                .orElseThrow(() -> new ServiceException("This reader id doesn't exist"));
 
-        daoReaderImplementation.findById(readerID)
-                .orElseThrow(() -> new IllegalArgumentException(READER_NOT_EXIST));
-
-        return daoBookImplementation.findAllByReaderId(readerID);
+        return bookDaoJdbcImpl.findAllByReaderId(readerIdNumeric);
     }
 
-    public void returnBook(String bookId) throws IllegalArgumentException {
-        if (!bookId.matches("^\\s*\\d+\\s*$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
+    public void returnBook (String bookId) {
+        long bookIdNumeric = convertStringToLong(bookId);
+
+        bookDaoJdbcImpl.findById(bookIdNumeric)
+                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
+
+        bookDaoJdbcImpl.returnBookToLibrary(bookIdNumeric);
+    }
+
+    public void borrowBookToReader (String inputBookIDAndReaderID) {
+        if (!inputBookIDAndReaderID.matches("^\\s*\\d+\\/(\\d+\\s*)$")) {
+            throw new ServiceException("Try again like this: book id/reader id. One slash, without spaces before and after. " +
+                    "Book id and reader id must be numeric");
         }
 
-        long bookID = Long.parseLong(bookId);
+        String[] bookIdAndReaderId = inputBookIDAndReaderID.split("/");
 
-        daoBookImplementation.findById(bookID)
-                .orElseThrow(() -> new IllegalArgumentException(BOOK_NOT_EXIST));
+        long bookIdNumeric = convertStringToLong(bookIdAndReaderId[0].trim());
+        long readerIdNumeric = convertStringToLong(bookIdAndReaderId[1].trim());
 
-        daoBookImplementation.returnBookToLibrary(bookID);
+        if (bookDaoJdbcImpl.findById(bookIdNumeric).isEmpty()) {
+            throw new ServiceException("This book id doesn't exist");
+        }
+
+        if (readerDaoJdbcImpl.findById(readerIdNumeric).isEmpty()) {
+            throw new ServiceException("This reader id doesn't exist");
+        }
+
+        bookDaoJdbcImpl.borrowBookToReader(bookIdNumeric, readerIdNumeric);
     }
 
 
-
-    public void borrowBookToReader(String inputBookIDAndReaderID) throws IllegalArgumentException {
-        if (!inputBookIDAndReaderID.matches("^\\s*(\\d+)(\\s\\/\\s)(\\d+\\s*)$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_RETURN_BOOK);
-        }
-
-        String[] bookIdAndAuthorId = inputBookIDAndReaderID.split("/");
-        long bookID = Long.parseLong(bookIdAndAuthorId[0].trim());
-        long readerID = Long.parseLong(bookIdAndAuthorId[1].trim());
-
-        if (daoReaderImplementation.findById(bookID).isEmpty()) {
-            throw new IllegalArgumentException(READER_NOT_EXIST);
-        }
-
-        if (daoBookImplementation.findById(readerID).isEmpty()) {
-            throw new IllegalArgumentException(BOOK_NOT_EXIST);
-        }
-
-        daoBookImplementation.borrowBookToReader(bookID, readerID);
-    }
-
-
-    public void addNewBook(String inputNameAndAuthor) throws IllegalArgumentException {
-        if (!inputNameAndAuthor.matches("^\\s*\\D([a-zA-Z]+)(\\s\\/\\s)([a-zA-Z]+\\s*)$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_ADD_BOOK);
+    public void addNewBook (String inputNameAndAuthor) {
+        if (!inputNameAndAuthor.matches("^[A-Za-z0-9\\s\\-_,\\.;:()]+(\\S\\/)([a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*)$")) {
+            throw new ServiceException("Try again like this: name/author. One slash, without spaces before and after. Author must be literal");
         }
 
         String[] nameAndAuthor = inputNameAndAuthor.split("/");
-        daoBookImplementation.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim(), 0));
+        bookDaoJdbcImpl.save(new Book(nameAndAuthor[0].trim(), nameAndAuthor[1].trim()));
     }
 
-    public void addNewReader(String fullName) throws IllegalArgumentException {
-        if (!fullName.matches("^[a-zA-Z]+\\s*[a-zA-Z]+$")) {
-            throw new IllegalArgumentException(ILLEGAL_ARGUMENT_FOR_ADD_READER);
+    public void addNewReader (String fullName) {
+        if (!fullName.matches("^[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*$")) {
+            throw new ServiceException("Full name must be literal and one space between words (max 3 words)");
         }
 
-        daoReaderImplementation.save(new Reader(fullName));
+        readerDaoJdbcImpl.save(new Reader(fullName));
     }
 
     public List<Book> findAllBooks () {
-        return daoBookImplementation.findAll();
+        return bookDaoJdbcImpl.findAll();
     }
 
     public List<Reader> findAllReaders () {
-        return daoReaderImplementation.findAll();
+        return readerDaoJdbcImpl.findAll();
+    }
+
+    public Map<Reader, List<Book>> findAllReadersWithBorrowedBooks () {
+        return readerDaoJdbcImpl.findAllWithBooks();
+    }
+
+    public Map<Book, Optional<Reader>> findAllBooksWithReaders () {
+        return bookDaoJdbcImpl.findAllWithReaders();
+    }
+
+    private long convertStringToLong (String id) {
+        try{
+            return Long.parseLong(id);
+        }catch (NumberFormatException e) {
+            throw new ServiceException("Id must be numeric");
+        }
     }
 }
