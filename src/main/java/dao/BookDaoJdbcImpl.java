@@ -6,7 +6,7 @@ import entity.Reader;
 import java.sql.*;
 import java.util.*;
 
-public class BookDaoJdbcImpl implements BookDaoJdbcInterface {
+public class BookDaoJdbcImpl implements BookDao {
     @Override
     public List<Book> findAll () {
         try (var connection = ConnectionUtil.createConnection();
@@ -58,9 +58,7 @@ public class BookDaoJdbcImpl implements BookDaoJdbcInterface {
 
     private Book mapToBook(ResultSet rs) {
         try {
-            return rs.getInt("readerId") == 0 ? new Book(rs.getInt("id"), rs.getString("name"),
-                    rs.getString("author")) :
-                    new Book(rs.getInt("id"), rs.getString("name"),
+            return new Book(rs.getInt("id"), rs.getString("name"),
                             rs.getString("author"), rs.getInt("readerId"));
         } catch (SQLException e) {
             throw new DAOException("Failed to map resultSet to Book object!" + "\nError details: " + e.getMessage());
@@ -126,11 +124,10 @@ public class BookDaoJdbcImpl implements BookDaoJdbcInterface {
             Map<Book, Optional<Reader>> map = new TreeMap<>(Comparator.comparing(Book::getId));
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    if (resultSet.getString("readerName") == null) {
-                        map.put(mapToBook(resultSet), Optional.empty());
-                    } else {
-                        map.put(mapToBook(resultSet), Optional.of(new Reader(resultSet.getString("readerName"))));
-                    }
+                    var readerName = resultSet.getString("readerName");
+                    var reader = Optional.ofNullable(readerName)
+                            .map(Reader::new);
+                    map.put(mapToBook(resultSet), reader);
                 }
             }
 

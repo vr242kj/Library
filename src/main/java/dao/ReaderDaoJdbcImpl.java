@@ -5,8 +5,10 @@ import entity.Reader;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
+public class ReaderDaoJdbcImpl implements ReaderDao {
     @Override
     public List<Reader> findAll () {
         try (var connection = ConnectionUtil.createConnection();
@@ -81,7 +83,8 @@ public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
             throw new DAOException("Database error during retrieval reader by book Id!" + "\nError details: " + e.getMessage());
         }
     }
-    public Map<Reader, List<Book>> findAllWithBooks () {
+
+    public Map<Reader, List<Book>> findAllWithBooks() {
         var query = """
                 select
                     reader.id,
@@ -97,10 +100,11 @@ public class ReaderDaoJdbcImpl implements ReaderDaoJdbcInterface {
             Map<Reader, List<Book>> map = new TreeMap<>(Comparator.comparing(Reader::getId));
             try (var resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    if (!map.containsKey(mapToReader(resultSet))) {
-                        map.put(mapToReader(resultSet), new ArrayList<>());
-                    }
-                    map.get(mapToReader(resultSet)).add(new Book(resultSet.getLong("bookId"), resultSet.getString("bookName"), resultSet.getString("bookAuthor")));
+                    map.merge(mapToReader(resultSet), List.of(new Book(resultSet.getLong("bookId"), resultSet.getString("bookName"),
+                            resultSet.getString("bookAuthor"))), (oldValue, newValue) -> Stream
+                            .concat(oldValue.stream(), newValue.stream())
+                            .toList()
+                    );
                 }
             }
             return map;

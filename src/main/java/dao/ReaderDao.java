@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface ReaderDaoJdbcInterface {
+public interface ReaderDao {
     List<Reader> findAll ();
     Optional<Reader> findById (long id);
     Reader save (Reader readerToSave);

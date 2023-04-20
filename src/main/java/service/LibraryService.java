@@ -1,8 +1,8 @@
 package service;
 
 import dao.BookDaoJdbcImpl;
-import dao.BookDaoJdbcInterface;
-import dao.ReaderDaoJdbcInterface;
+import dao.BookDao;
+import dao.ReaderDao;
 import dao.ReaderDaoJdbcImpl;
 import entity.Book;
 import entity.Reader;
@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public class LibraryService {
-    private final BookDaoJdbcInterface bookDaoJdbcImpl = new BookDaoJdbcImpl();
-    private final ReaderDaoJdbcInterface readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
+    private final BookDao bookDaoJdbcImpl = new BookDaoJdbcImpl();
+    private final ReaderDao readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
 
     public Optional<Reader> currentReaderOfBook (String bookId) {
         long bookIdNumeric = convertStringToLong(bookId);
