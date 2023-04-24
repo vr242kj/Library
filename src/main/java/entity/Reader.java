@@ -50,5 +50,6 @@ public class Reader  {
                         "id = " + id +
                         ", name = " + name +
                         "'}";
+
     }
 }
