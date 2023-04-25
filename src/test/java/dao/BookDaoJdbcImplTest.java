@@ -4,16 +4,14 @@ import entity.Book;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import service.ServiceException;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 class BookDaoJdbcImplTest {
 
@@ -24,28 +22,19 @@ class BookDaoJdbcImplTest {
         bookDaoJdbcImpl = new BookDaoJdbcImpl();
     }
 
-    @Test
-    @DisplayName("Should catch DAOException exception when book name is null")
-    void saveWithNullNameInBook() {
-        Book book = new Book(null,"XXX");
-        assertThrows(DAOException.class,
-                () -> bookDaoJdbcImpl.save(book));
-    }
+    @ParameterizedTest(name = "{index} ==> {2}")
+    @DisplayName("Should throw DaoException when book name or/and author is null")
+    @CsvSource(value = {",,name is null author is null",
+            "name,, author is null",
+            ",author, name is null"})
+    void saveWithWrongParamsInBook(String name, String author, String description) {
+        DAOException thrown = assertThrows(
+                DAOException.class,
+                () -> bookDaoJdbcImpl.save(new Book(name, author)),
+                "Expected DAOException to throw, but it didn't"
+        );
 
-    @Test
-    @DisplayName("Should catch DAOException exception when book author is null")
-    void saveWithNullAuthorInBook() {
-        Book book = new Book("XXX",null);
-        assertThrows(DAOException.class,
-                () -> bookDaoJdbcImpl.save(book));
-    }
-
-    @Test
-    @DisplayName("Should catch DAOException exception when book name and author is null")
-    void saveWithNullNameAndAuthorInBook() {
-        Book book = new Book(null,null);
-        assertThrows(DAOException.class,
-                () -> bookDaoJdbcImpl.save(book));
+        assertEquals("Database error during saving new book!" + "\nError details: ", thrown.getMessage());
     }
 
     @Test
@@ -60,11 +49,15 @@ class BookDaoJdbcImplTest {
     @DisplayName("Should check book is created and appear in database")
     void saveBookAndCheckAppearsInDB() {
         Book book = new Book("XXX","YYY");
+        List<Book> listAllBooks= bookDaoJdbcImpl.findAll();
+        assertFalse(listAllBooks.contains(book));
+
         Book returnedBook = bookDaoJdbcImpl.save(book);
         assertTrue(returnedBook.getId() != 0);
-        List<Book> listAllBooks= bookDaoJdbcImpl.findAll();
-        //assertTrue(listAllBooks.contains(returnedBook));
         assertTrue(bookDaoJdbcImpl.findById(returnedBook.getId()).isPresent());
+
+        listAllBooks= bookDaoJdbcImpl.findAll();
+        assertTrue(listAllBooks.contains(returnedBook));
     }
 
     @Test
