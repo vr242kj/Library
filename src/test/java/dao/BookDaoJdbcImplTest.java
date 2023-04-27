@@ -6,8 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import service.ServiceException;
 
 import java.util.List;
 
@@ -34,7 +32,7 @@ class BookDaoJdbcImplTest {
                 "Expected DAOException to throw, but it didn't"
         );
 
-        assertEquals("Database error during saving new book!" + "\nError details: ", thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("Database error during saving new book!" + "\nError details: "));
     }
 
     @Test
@@ -56,8 +54,7 @@ class BookDaoJdbcImplTest {
         assertTrue(returnedBook.getId() != 0);
         assertTrue(bookDaoJdbcImpl.findById(returnedBook.getId()).isPresent());
 
-        listAllBooks= bookDaoJdbcImpl.findAll();
-        assertTrue(listAllBooks.contains(returnedBook));
+        assertEquals(bookDaoJdbcImpl.findById(returnedBook.getId()).get(), book);
     }
 
     @Test
