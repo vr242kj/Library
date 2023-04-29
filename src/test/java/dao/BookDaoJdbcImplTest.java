@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,15 +47,18 @@ class BookDaoJdbcImplTest {
     @Test
     @DisplayName("Should check book is created and appear in database")
     void saveBookAndCheckAppearsInDB() {
-        Book book = new Book("XXX","YYY");
-        List<Book> listAllBooks= bookDaoJdbcImpl.findAll();
-        assertFalse(listAllBooks.contains(book));
+        Book exampleBook = new Book("name","author");
+        List<Book> listAllBooksOnlyNameAndAuthor = bookDaoJdbcImpl.findAll().stream()
+                .map(book -> new Book(book.getName(), book.getAuthor()))
+                .toList();
 
-        Book returnedBook = bookDaoJdbcImpl.save(book);
+        assertFalse(listAllBooksOnlyNameAndAuthor.contains(exampleBook));
+
+        Book returnedBook = bookDaoJdbcImpl.save(exampleBook);
         assertTrue(returnedBook.getId() != 0);
         assertTrue(bookDaoJdbcImpl.findById(returnedBook.getId()).isPresent());
 
-        assertEquals(bookDaoJdbcImpl.findById(returnedBook.getId()).get(), book);
+        assertEquals(bookDaoJdbcImpl.findById(returnedBook.getId()).get(), exampleBook);
     }
 
     @Test
