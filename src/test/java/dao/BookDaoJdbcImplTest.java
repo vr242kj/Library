@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,18 +48,26 @@ class BookDaoJdbcImplTest {
     @Test
     @DisplayName("Should check book is created and appear in database")
     void saveBookAndCheckAppearsInDB() {
-        Book exampleBook = new Book("name","author");
-        List<Book> listAllBooksOnlyNameAndAuthor = bookDaoJdbcImpl.findAll().stream()
-                .map(book -> new Book(book.getName(), book.getAuthor()))
-                .toList();
+        var bookName = "Name";
+        var bookAuthor = "Author";
+        var bookToSave = new Book(bookName, bookAuthor);
 
-        assertFalse(listAllBooksOnlyNameAndAuthor.contains(exampleBook));
+        Optional<Book> existingInDb = bookDaoJdbcImpl.findAll().stream()
+                .filter(book -> bookAuthor.equals(book.getAuthor()) && bookName.equals(book.getName()))
+                .findAny();
 
-        Book returnedBook = bookDaoJdbcImpl.save(exampleBook);
-        assertTrue(returnedBook.getId() != 0);
-        assertTrue(bookDaoJdbcImpl.findById(returnedBook.getId()).isPresent());
+        assertTrue(existingInDb.isEmpty(), "This book is not expected to be in DB before the test");
 
-        assertEquals(bookDaoJdbcImpl.findById(returnedBook.getId()).get(), exampleBook);
+        var generatedId = bookDaoJdbcImpl.save(bookToSave).getId();
+        assertTrue(generatedId > 0);
+
+        var savedBook = bookDaoJdbcImpl.findById(generatedId).get();
+
+        assertAll(
+                () -> assertNotNull(savedBook),
+                () -> assertEquals(bookName, savedBook.getName()),
+                () -> assertEquals(bookAuthor, savedBook.getAuthor())
+        );
     }
 
     @Test
