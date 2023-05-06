@@ -2,14 +2,13 @@ package dao;
 
 import entity.Book;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,14 +37,6 @@ class BookDaoJdbcImplTest {
     }
 
     @Test
-    @DisplayName("Should create new book with unique id")
-    void saveBookAndCreateUniqueId() {
-        Book book = new Book("XXX","YYY");
-        Book returnedBook = bookDaoJdbcImpl.save(book);
-        assertTrue(returnedBook.getId() != 0);
-    }
-
-    @Test
     @DisplayName("Should check book is created and appear in database")
     void saveBookAndCheckAppearsInDB() {
         var bookName = "Name";
@@ -68,28 +59,7 @@ class BookDaoJdbcImplTest {
                 () -> assertEquals(bookName, savedBook.getName()),
                 () -> assertEquals(bookAuthor, savedBook.getAuthor())
         );
-    }
 
-    @Test
-    void findAll() {
-    }
-
-    @Test
-    void findById() {
-    }
-
-    @Test
-    void findAllByReaderId() {
-    }
-    @Test
-    void borrowBookToReader() {
-    }
-
-    @Test
-    void returnBookToLibrary() {
-    }
-
-    @Test
-    void findAllWithReaders() {
+        bookDaoJdbcImpl.deleteById(generatedId);
     }
 }

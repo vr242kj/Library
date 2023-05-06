@@ -65,7 +65,7 @@ public class BookDaoJdbcImpl implements BookDao {
                     rs.getInt("readerId")
             );
         } catch (SQLException e) {
-            throw new DAOException("Failed to map resultSet to Book object!" + "\nError details: " + e.getMessage());
+            throw new DAOException("Failed map resultSet to Book object!" + "\nError details: " + e.getMessage());
         }
     }
 
@@ -138,6 +138,17 @@ public class BookDaoJdbcImpl implements BookDao {
             return map;
         } catch (SQLException e) {
             throw new DAOException("Database error during retrieval of available books with readers list!" + "\nError details: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteById(long id) {
+        try (var connection =  ConnectionUtil.createConnection();
+            var statement = connection.prepareStatement("delete from book where id = ?")) {
+            statement.setLong(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("Database error, during deleting book by book id!" + "\nError details: " + e.getMessage());
         }
     }
 }
