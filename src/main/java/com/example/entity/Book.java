@@ -2,6 +2,8 @@ package com.example.entity;
 
 import java.util.Objects;
 
+import java.util.Objects;
+
 public class Book {
     private long id;
     private String name;
