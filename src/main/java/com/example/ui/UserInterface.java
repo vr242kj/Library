@@ -1,13 +1,13 @@
-package ui;
+package com.example.ui;
 
-import dao.BookDaoJdbcImpl;
-import dao.DAOException;
-import dao.ReaderDaoJdbcImpl;
+import com.example.dao.BookDaoJdbcImpl;
+import com.example.dao.DAOException;
+import com.example.dao.ReaderDaoJdbcImpl;
 
-import entity.Book;
-import entity.Reader;
-import service.LibraryService;
-import service.ServiceException;
+import com.example.entity.Book;
+import com.example.entity.Reader;
+import com.example.service.LibraryService;
+import com.example.service.ServiceException;
 
 import java.util.*;
 

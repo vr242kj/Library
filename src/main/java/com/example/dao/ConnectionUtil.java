@@ -1,4 +1,4 @@
-package dao;
+package com.example.dao;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class ConnectionUtil {
         Connection connection = null;
 
         String url = properties.getProperty("url");
-        String username = properties.getProperty("name");
+        String username = properties.getProperty("user");
         String password = properties.getProperty("password");
 
         try {

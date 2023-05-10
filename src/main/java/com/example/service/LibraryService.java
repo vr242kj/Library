@@ -1,11 +1,9 @@
-package service;
+package com.example.service;
 
-import dao.BookDaoJdbcImpl;
-import dao.BookDao;
-import dao.ReaderDao;
-import dao.ReaderDaoJdbcImpl;
-import entity.Book;
-import entity.Reader;
+import com.example.dao.BookDao;
+import com.example.dao.ReaderDao;
+import com.example.entity.Book;
+import com.example.entity.Reader;
 
 import java.util.List;
 import java.util.Map;

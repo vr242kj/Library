@@ -3,11 +3,13 @@ package service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import dao.BookDao;
-import dao.DAOException;
-import dao.ReaderDao;
-import entity.Book;
-import entity.Reader;
+import com.example.dao.BookDao;
+import com.example.dao.DAOException;
+import com.example.dao.ReaderDao;
+import com.example.entity.Book;
+import com.example.entity.Reader;
+import com.example.service.LibraryService;
+import com.example.service.ServiceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
