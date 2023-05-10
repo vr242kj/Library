@@ -49,6 +49,7 @@ public class Reader  {
                 "Reader{" +
                         "id = " + id +
                         ", name = " + name +
-                        '}';
+                        "'}";
+
     }
 }

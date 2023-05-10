@@ -121,4 +121,15 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
             throw new DAOException("Database error during retrieval of available readers with borrowed books list!" + "\nError details: " + e.getMessage());
         }
     }
+
+    @Override
+    public void deleteById(long id) {
+        try (var connection = ConnectionUtil.createConnection();
+            var statement = connection.prepareStatement("delete from reader where id = ?")) {
+            statement.setLong(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("Database error, during deleting reader by reader id!" + "\nError details: " + e.getMessage());
+        }
+    }
 }

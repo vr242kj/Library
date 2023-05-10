@@ -12,8 +12,14 @@ import java.util.Map;
 import java.util.Optional;
 
 public class LibraryService {
-    private final BookDao bookDaoJdbcImpl = new BookDaoJdbcImpl();
-    private final ReaderDao readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
+
+private final BookDao bookDaoJdbcImpl;
+    private final ReaderDao readerDaoJdbcImpl;
+
+    public LibraryService(BookDao bookDao, ReaderDao readerDao){
+        this.bookDaoJdbcImpl = bookDao;
+        this.readerDaoJdbcImpl = readerDao;
+    }
 
     public Optional<Reader> currentReaderOfBook (String bookId) {
         long bookIdNumeric = convertStringToLong(bookId);
@@ -43,7 +49,8 @@ public class LibraryService {
     }
 
     public void borrowBookToReader (String inputBookIDAndReaderID) {
-        if (!inputBookIDAndReaderID.matches("^\\s*\\d+\\/(\\d+\\s*)$")) {
+        if (!inputBookIDAndReaderID.matches("^\\s*\\d+\\/\\d+\\s*$")) {
+
             throw new ServiceException("Try again like this: book id/reader id. One slash, without spaces before and after. " +
                     "Book id and reader id must be numeric");
         }
@@ -66,7 +73,8 @@ public class LibraryService {
 
 
     public void addNewBook (String inputNameAndAuthor) {
-        if (!inputNameAndAuthor.matches("^[A-Za-z0-9\\s\\-_,\\.;:()]+(\\S\\/)([a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*)$")) {
+        if (!inputNameAndAuthor.matches("^[A-Za-z0-9\\s\\-_,\\.;:()]*[A-Za-z0-9\\-_,\\.;:()]+\\/[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*$")) {
+
             throw new ServiceException("Try again like this: name/author. One slash, without spaces before and after. Author must be literal");
         }
 

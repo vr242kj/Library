@@ -1,6 +1,9 @@
 package ui;
 
+import dao.BookDaoJdbcImpl;
 import dao.DAOException;
+import dao.ReaderDaoJdbcImpl;
+
 import entity.Book;
 import entity.Reader;
 import service.LibraryService;
@@ -9,7 +12,8 @@ import service.ServiceException;
 import java.util.*;
 
 public class UserInterface {
-    private final LibraryService libraryService = new LibraryService();
+    private final LibraryService libraryService = new LibraryService(new BookDaoJdbcImpl(), new ReaderDaoJdbcImpl());
+
     private final Scanner input = new Scanner(System.in);
 
     public void printMenu() {
