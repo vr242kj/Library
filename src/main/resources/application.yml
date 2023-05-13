@@ -3,10 +3,10 @@ spring:
     name: Library
   # Database
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/library
     username: postgres
     password: olimp123
+    driver-class-name: org.postgresql.Driver
 # Server configuration
 server:
   port: 8081
