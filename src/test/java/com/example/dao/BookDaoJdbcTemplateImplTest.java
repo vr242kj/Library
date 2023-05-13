@@ -1,10 +1,24 @@
 package com.example.dao;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+
+import javax.sql.DataSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class BookDaoJdbcTemplateImplTest {
+    private JdbcTemplate jdbcTemplate;
+    private BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
+    @Autowired
+    public BookDaoJdbcTemplateImplTest(DataSource dataSource) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        bookDaoJdbcTemplate = new BookDaoJdbcTemplateImpl(dataSource);
+    }
 
     @Test
     void findAll() {

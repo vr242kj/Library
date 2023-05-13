@@ -10,6 +10,8 @@ public class Book {
     private String author;
     private long readerId;
 
+    public Book(){}
+
     public Book(long id, String name, String author, long readerId) {
         this.id = id;
         this.name = name;
@@ -32,6 +34,18 @@ public class Book {
         if (this.id == 0) {
             this.id = id;
         }
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setReaderId(long readerId) {
+        this.readerId = readerId;
     }
 
     public long getId() {
