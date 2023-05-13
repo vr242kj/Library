@@ -8,7 +8,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -86,20 +85,6 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                     left join reader on book.readerId = reader.id
                 """;
         Map<Book, Optional<Reader>> booksWithReaders = new TreeMap<>(Comparator.comparing(Book::getId));
-
-        //List<Map<String, Object>> booksWithReaders = jdbcTemplate.queryForList(SQL_FIND_ALL_WITH_READERS);
-
-        /*for (Map<String, Object> booksAndReader: booksWithReaders) {
-            var readerName = booksAndReader.get("readerName").toString();
-            var reader = Optional.ofNullable(readerName)
-                    .map(Reader::new);
-
-            map.put(new Book((Long) booksAndReader.get("readerName"),
-                    booksAndReader.get("name").toString(),
-                    booksAndReader.get("author").toString(),
-                    (Long) booksAndReader.get("readerId")), reader);
-        }
-        return  map;*/
 
         jdbcTemplate.query(SQL_FIND_ALL_WITH_READERS, (rs, rowNum) -> {
             var book = mapToBook(rs, rowNum);
