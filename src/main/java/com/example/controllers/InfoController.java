@@ -23,6 +23,6 @@ public class InfoController {
         var info = Map.of("message", "Welcome to the library!",
                 "currentDate", DateTimeFormatter.ofPattern("dd.MM.yyyy").format(LocalDateTime.now()));
 
-        return new ResponseEntity<>(info, HttpStatus.OK);
+        return ResponseEntity.ok(info);
     }
 }
