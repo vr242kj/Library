@@ -43,11 +43,11 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
 
     @Override
     public Book save(Book bookToSave) {
-        String SQL_INSERT = "insert into book(name, author) values(?, ?)";
+        var SQL_ADD_NEW_BOOK = "insert into book(name, author) values(?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            var ps = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+            var ps = connection.prepareStatement(SQL_ADD_NEW_BOOK, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, bookToSave.getName());
             ps.setString(2, bookToSave.getAuthor());
             return ps;
@@ -74,7 +74,7 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
 
     @Override
     public Map<Book, Optional<Reader>> findAllWithReaders() {
-        String SQL_FIND_ALL_WITH_READERS = """
+        var SQL_FIND_ALL_WITH_READERS = """
                 select
                     book.id,
                     book.name,
@@ -100,8 +100,7 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
 
     @Override
     public void deleteById(long id) {
-        jdbcTemplate.update("delete from book where id = ?",
-                id);
+        jdbcTemplate.update("delete from book where id = ?", id);
     }
 
     private Book mapToBook(ResultSet rs, int rowNum) {

@@ -1,8 +1,10 @@
+
 package com.example;
 
 import com.example.dao.BookDao;
 import com.example.entity.Book;
 import com.example.entity.Reader;
+import com.example.ui.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@SpringBootApplication
+/*@SpringBootApplication
 @ConfigurationPropertiesScan
 public class Main {
 
@@ -47,5 +49,13 @@ public class Main {
         System.out.println("Books with Readers: " + booksWithReaders);
 
         bookDao.deleteById(savedBook.getId());
+    }
+}*/
+
+public class Main {
+
+    public static void main(String[] args) {
+        UserInterface userInterface = new UserInterface();
+        userInterface.printMenu();
     }
 }
