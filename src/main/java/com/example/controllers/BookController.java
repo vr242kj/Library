@@ -2,6 +2,7 @@ package com.example.controllers;
 
 import com.example.dao.BookDao;
 import com.example.entity.Book;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,11 @@ public class BookController {
     @GetMapping("/books")
     public ResponseEntity<List<Book>> getAllBooks() {
         var books = bookDao.findAll();
-        return new ResponseEntity<>(books, HttpStatus.OK);
+        return ResponseEntity.ok(books);
     }
 
     @PostMapping("/books")
-    public ResponseEntity<Book> saveBook(@RequestBody Book book) {
+    public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
         var bookToSave = bookDao.save(book);
         return ResponseEntity
                 .created(URI
