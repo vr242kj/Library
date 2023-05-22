@@ -1,14 +1,12 @@
 package com.example;
 
 import com.example.dao.BookDao;
-import com.example.dao.ConnectionUtilSpring;
 import com.example.entity.Book;
 import com.example.entity.Reader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
