@@ -80,10 +80,10 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
             throw new DAOException("Failed to save new book: " + bookToSave.toString(), ex);
         }
 
-        var generatedId = (Integer) Objects.requireNonNull(keyHolder.getKeys()).get("id");
+        var generatedKeys = keyHolder.getKeys();
 
-        if (generatedId != null) {
-            bookToSave.setId(generatedId);
+        if (generatedKeys != null && generatedKeys.containsKey("id")) {
+            bookToSave.setId((Integer) generatedKeys.get("id"));
         } else {
             logger.error("Generated ID is null for book: {}", bookToSave);
             throw new DAOException("Failed to retrieve generated ID for book: " + bookToSave.toString());
