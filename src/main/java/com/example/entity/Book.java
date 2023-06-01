@@ -10,11 +10,10 @@ public class Book {
     @NotNull
     private long id;
     @NotBlank(message = "Name is required")
-    @Pattern(regexp = "[A-Za-z0-9\\s\\-_,\\.;:()]*[A-Za-z0-9\\-_,\\.;:()]+")
+    @Pattern(regexp = "[A-Za-z0-9\\s\\-_,\\.;:()]*[A-Za-z0-9\\-_,\\.;:()]+", message = "Must match the pattern")
     private String name;
     @NotBlank(message = "Author is required")
-
-    @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*")
+    @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*", message = "Must match the pattern")
     private String author;
     private long readerId;
 

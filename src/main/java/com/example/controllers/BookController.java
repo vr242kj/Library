@@ -2,6 +2,7 @@ package com.example.controllers;
 
 import com.example.dao.BookDao;
 import com.example.entity.Book;
+import com.example.service.ServiceException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
