@@ -1,7 +1,7 @@
-package dao;
+package com.example.dao;
 
-import entity.Book;
-import entity.Reader;
+import com.example.entity.Book;
+import com.example.entity.Reader;
 
 import java.util.List;
 import java.util.Map;
