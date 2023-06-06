@@ -1,5 +1,6 @@
 package com.example.controllers.exceptionHandler;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,6 +20,13 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
 
         ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errors);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        String errorMessage = "An error occurred: " + ex.getMessage();
+        ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
         return ResponseEntity.badRequest().body(response);
     }
 }

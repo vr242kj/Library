@@ -30,8 +30,7 @@ public class BookController {
     public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
         var bookToSave = bookDao.save(book);
         return ResponseEntity
-                .created(URI
-                        .create(String.format("/book/%d", book.getId())))
+                .created(URI.create(String.format("/book/%d", book.getId())))
                 .body(bookToSave);
     }
 }
