@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -118,29 +119,33 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
         Map<Reader, List<Book>> readersWithBook = new TreeMap<>(Comparator.comparing(Reader::getId));
 
         try {
-            jdbcTemplate.query(FIND_ALL_READERS_WITH_BOOK, (rs, rowNum) -> {
-                var book = new Book(
-                        rs.getLong("bookId"),
-                        rs.getString("bookName"),
-                        rs.getString("bookAuthor")
-                );
-
-                readersWithBook.merge(
-                        mapToReader(rs, rowNum),
-                        List.of(book),
-                        (addedBooks, newBooks) -> Stream
-                                .concat(addedBooks.stream(), newBooks.stream())
-                                .toList()
-                );
-
-                return book;
-            });
+            jdbcTemplate.query(FIND_ALL_READERS_WITH_BOOK, mapToReadersWithBook(readersWithBook));
         } catch (DataAccessException ex) {
             logger.error("Failed to retrieve readers with books, due to DB internal error: {}", ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve readers with books", ex);
         }
 
         return readersWithBook;
+    }
+
+    private RowMapper<Book> mapToReadersWithBook(Map<Reader, List<Book>> readersWithBook) {
+        return (rs, rowNum) -> {
+            var book = new Book(
+                    rs.getLong("bookId"),
+                    rs.getString("bookName"),
+                    rs.getString("bookAuthor")
+            );
+
+            readersWithBook.merge(
+                    mapToReader(rs, rowNum),
+                    List.of(book),
+                    (addedBooks, newBooks) -> Stream
+                            .concat(addedBooks.stream(), newBooks.stream())
+                            .toList()
+            );
+
+            return book;
+        };
     }
 
     @Override
