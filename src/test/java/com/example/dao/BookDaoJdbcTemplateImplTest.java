@@ -1,4 +1,3 @@
-/*
 package com.example.dao;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BookDaoJdbcTemplateImplTest {
     private JdbcTemplate jdbcTemplate;
     private BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
-
+    @Autowired
     public BookDaoJdbcTemplateImplTest(DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
         bookDaoJdbcTemplate = new BookDaoJdbcTemplateImpl(dataSource);
@@ -53,4 +52,4 @@ class BookDaoJdbcTemplateImplTest {
     void deleteById() {
     }
 }
-*/
+
