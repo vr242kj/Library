@@ -2,6 +2,9 @@ package com.example.dao;
 
 import com.example.entity.Book;
 import com.example.entity.Reader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -23,18 +26,29 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(BookDaoJdbcTemplateImpl.class);
 
     @Override
     public List<Reader> findAll() {
-        return jdbcTemplate.query("select * from reader",
-                this::mapToReader);
+        try {
+            return jdbcTemplate.query("select * from reader",
+                    this::mapToReader);
+        } catch (DataAccessException ex) {
+            logger.error("Failed to retrieval reader from the database, due to DB internal error: {}", ex.getLocalizedMessage());
+            throw new DAOException("Failed to retrieve reader from the database.", ex);
+        }
     }
 
     @Override
     public Optional<Reader> findById(long id) {
-        return jdbcTemplate.query("select * from reader where id = ?",
-                        this::mapToReader, id)
-                .stream().findFirst();
+        try {
+            return jdbcTemplate.query("select * from reader where id = ?",
+                            this::mapToReader, id)
+                    .stream().findFirst();
+        } catch (DataAccessException ex) {
+            logger.error("Failed to retrieve reader with id {} from the database, due to DB internal error: {}", id, ex.getLocalizedMessage());
+            throw new DAOException("Failed to retrieve reader from the database.", ex);
+        }
     }
 
     @Override
@@ -42,23 +56,50 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
         String SQL_INSERT = "insert into reader(name) values(?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            var ps = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, readerToSave.getName());
-            return ps;
-        }, keyHolder);
 
-        var generatedId = (Integer) Objects.requireNonNull(keyHolder.getKeys()).get("id");
-        readerToSave.setId(generatedId);
+        try {
+            jdbcTemplate.update(connection -> {
+                var ps = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, readerToSave.getName());
+                return ps;
+            }, keyHolder);
+        } catch (DataAccessException ex) {
+            logger.error("Failed to create new book {} in DB, due to DB internal error: {}", readerToSave, ex.getLocalizedMessage());
+            throw new DAOException("Failed to save new book: " + readerToSave.toString(), ex);
+        }
+
+        Optional.ofNullable(keyHolder.getKeys())
+                .map(keys -> keys.get("id"))
+                .map(Integer.class::cast)
+                .ifPresentOrElse(
+                        readerToSave::setId,
+                        () -> {
+                            logger.error("Generated ID is null for reader: {}", readerToSave);
+                            throw new DAOException("Failed to retrieve generated ID for reader: " + readerToSave.toString());
+                        }
+                );
 
         return readerToSave;
     }
 
     @Override
     public Optional<Reader> findByBookId(long bookId) {
-        return jdbcTemplate.query("select reader.id, reader.name from reader inner join book on reader.id = book.readerid where book.id = ?",
-                this::mapToReader, bookId)
-                .stream().findFirst();
+        String SQL_SELECT = """
+                select
+                    reader.id,
+                    reader.name 
+                from reader 
+                    inner join book on reader.id = book.readerid 
+                where book.id = ?
+                """;
+
+        try {
+            return jdbcTemplate.query(SQL_SELECT, this::mapToReader, bookId).stream()
+                    .findFirst();
+        } catch (DataAccessException ex) {
+            logger.error("Failed to retrieve reader by bookId: {}. Error details: {}", bookId, ex.getLocalizedMessage());
+            throw new DAOException("Failed to retrieve reader by bookId: " + bookId, ex);
+        }
     }
 
     @Override
@@ -76,30 +117,40 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
 
         Map<Reader, List<Book>> readersWithBook = new TreeMap<>(Comparator.comparing(Reader::getId));
 
-        jdbcTemplate.query(FIND_ALL_READERS_WITH_BOOK, (rs, rowNum) -> {
-            var book = new Book(
-                    rs.getLong("bookId"),
-                    rs.getString("bookName"),
-                    rs.getString("bookAuthor")
-            );
+        try {
+            jdbcTemplate.query(FIND_ALL_READERS_WITH_BOOK, (rs, rowNum) -> {
+                var book = new Book(
+                        rs.getLong("bookId"),
+                        rs.getString("bookName"),
+                        rs.getString("bookAuthor")
+                );
 
-            readersWithBook.merge(
-                    mapToReader(rs, rowNum),
-                    List.of(book),
-                    (addedBooks, newBooks) -> Stream
-                            .concat(addedBooks.stream(), newBooks.stream())
-                            .toList()
-            );
+                readersWithBook.merge(
+                        mapToReader(rs, rowNum),
+                        List.of(book),
+                        (addedBooks, newBooks) -> Stream
+                                .concat(addedBooks.stream(), newBooks.stream())
+                                .toList()
+                );
 
-            return book;
-        });
+                return book;
+            });
+        } catch (DataAccessException ex) {
+            logger.error("Failed to retrieve readers with books, due to DB internal error: {}", ex.getLocalizedMessage());
+            throw new DAOException("Failed to retrieve readers with books", ex);
+        }
 
         return readersWithBook;
     }
 
     @Override
     public void deleteById(long id) {
-        jdbcTemplate.update("delete from reader where id = ?", id);
+        try {
+            jdbcTemplate.update("delete from reader where id = ?", id);
+        } catch (DataAccessException ex) {
+            logger.error("Failed to delete reader with ID {}. Error details: {}", id, ex.getLocalizedMessage());
+            throw new DAOException("Failed to delete reader with ID " + id, ex);
+        }
     }
 
     private Reader mapToReader(ResultSet rs, int rowNum) {
