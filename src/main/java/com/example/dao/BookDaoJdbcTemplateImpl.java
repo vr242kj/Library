@@ -4,6 +4,7 @@ import com.example.entity.Book;
 import com.example.entity.Reader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,13 +19,12 @@ import java.util.*;
 
 @Repository
 public class BookDaoJdbcTemplateImpl implements BookDao {
-    private final JdbcTemplate jdbcTemplate;
-
-    public BookDaoJdbcTemplateImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(BookDaoJdbcTemplateImpl.class);
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Override
     public List<Book> findAll() {
         try {
