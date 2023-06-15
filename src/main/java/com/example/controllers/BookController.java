@@ -1,8 +1,9 @@
 package com.example.controllers;
 
-import com.example.dao.BookDao;
 import com.example.entity.Book;
 import com.example.entity.Reader;
+import com.example.service.BookService;
+import com.example.service.ReaderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +18,32 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/api/v1/books")
 public class BookController {
 
     @Autowired
-    private BookDao bookDao;
+    private ReaderService readerService;
+
+    @Autowired
+    private BookService bookService;
 
     @GetMapping
     public ResponseEntity<List<Book>> getAllBooks() {
-        var books = bookDao.findAll();
+        var books = bookService.findAllBooks();
+
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(books);
     }
 
     @PostMapping
     public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
-        var bookToSave = bookDao.save(book);
+        var bookToSave = bookService.addNewBook(book);
         return ResponseEntity
                 .created(URI.create(String.format("/book/%d", book.getId())))
                 .body(bookToSave);
@@ -44,37 +51,25 @@ public class BookController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable long id) {
-        Optional<Book> book = bookDao.findById(id);
+        Optional<Book> book = bookService.findByBookId(id);
         return book.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/reader/{readerId}")
-    public ResponseEntity<List<Book>> getBooksByReaderId(@PathVariable long readerId) {
-        List<Book> books = bookDao.findAllByReaderId(readerId);
-        return ResponseEntity.ok(books);
+    @GetMapping("/{bookId}/readers")
+    public ResponseEntity<Reader> getReaderByBookId(@PathVariable long bookId) {
+        Optional<Reader> reader = readerService.getReaderByBookId(bookId);
+        return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{bookId}/borrow/{readerId}")
-    public ResponseEntity<String> borrowBookToReader(@PathVariable long bookId, @PathVariable long readerId) {
-        bookDao.borrowBookToReader(bookId, readerId);
-        return ResponseEntity.ok("Book borrowed successfully.");
-    }
-
-    @PutMapping("/{bookId}/return")
+    @PutMapping("/{bookId}")
     public ResponseEntity<String> returnBookToLibrary(@PathVariable long bookId) {
-        bookDao.returnBookToLibrary(bookId);
-        return ResponseEntity.ok("Book returned to the library.");
-    }
-
-    @GetMapping("/with-readers")
-    public ResponseEntity<Map<Book, Optional<Reader>>> getAllBooksWithReaders() {
-        Map<Book, Optional<Reader>> allBooksWithReaders = bookDao.findAllWithReaders();
-        return ResponseEntity.ok(allBooksWithReaders);
+        bookService.updateReaderByBookId(bookId);
+        return ResponseEntity.ok("Book availability updated");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBookById(@PathVariable long id) {
-        bookDao.deleteById(id);
+        bookService.deleteBookById(id);
         return ResponseEntity.ok("Book deleted successfully.");
     }
 

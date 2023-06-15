@@ -1,8 +1,9 @@
 package com.example.controllers;
 
-import com.example.dao.ReaderDao;
 import com.example.entity.Book;
 import com.example.entity.Reader;
+import com.example.service.BookService;
+import com.example.service.ReaderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -24,43 +24,50 @@ import java.util.Optional;
 public class ReaderController {
 
     @Autowired
-    private ReaderDao readerDao;
+    private ReaderService readerService;
+
+    @Autowired
+    private BookService bookService;
 
     @GetMapping
     public ResponseEntity<List<Reader>> getAllReaders() {
-        List<Reader> readers = readerDao.findAll();
-        return ResponseEntity.ok(readers);
-    }
+        List<Reader> readers = readerService.findAllReaders();
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Reader> getReaderById(@PathVariable long id) {
-        Optional<Reader> reader = readerDao.findById(id);
-        return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        if (readers.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(readers);
     }
 
     @PostMapping
     public ResponseEntity<Reader> saveReader(@Valid @RequestBody Reader reader) {
-        var readerToSave = readerDao.save(reader);
+        var readerToSave = readerService.addNewReader(reader);
         return ResponseEntity
                 .created(URI.create(String.format("/reader/%d", reader.getId())))
                 .body(readerToSave);
     }
 
-    @GetMapping("/book/{bookId}")
-    public ResponseEntity<Reader> getReaderByBookId(@PathVariable long bookId) {
-        Optional<Reader> reader = readerDao.findByBookId(bookId);
+    @GetMapping("/{id}")
+    public ResponseEntity<Reader> getReaderById(@PathVariable long id) {
+        Optional<Reader> reader = readerService.findByReaderId(id);
         return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/with-books")
-    public ResponseEntity<Map<Reader, List<Book>>> getAllReadersWithBooks() {
-        Map<Reader, List<Book>> readersWithBooks = readerDao.findAllWithBooks();
-        return ResponseEntity.ok(readersWithBooks);
+    @GetMapping("/{readerId}/books")
+    public ResponseEntity<List<Book>> getBooksByReaderId(@PathVariable long readerId) {
+        List<Book> books = bookService.getBooksByReaderId(readerId);
+
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(books);
     }
 
-    @DeleteMapping("/{readerId}")
-    public ResponseEntity<String> deleteReaderById(@PathVariable long readerId) {
-        readerDao.deleteById(readerId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteReaderById(@PathVariable long id) {
+        readerService.deleteReaderById(id);
         return ResponseEntity.ok("Reader deleted successfully.");
     }
 
