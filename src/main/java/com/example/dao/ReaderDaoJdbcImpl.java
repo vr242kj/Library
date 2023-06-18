@@ -132,4 +132,5 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
             throw new DAOException("Database error, during deleting reader by reader id!" + "\nError details: " + e.getMessage());
         }
     }
+
 }
