@@ -31,7 +31,7 @@ public class ReaderController {
 
     @GetMapping
     public ResponseEntity<List<Reader>> getAllReaders() {
-        List<Reader> readers = readerService.findAllReaders();
+        var readers = readerService.findAllReaders();
 
         if (readers.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -42,10 +42,10 @@ public class ReaderController {
 
     @PostMapping
     public ResponseEntity<Reader> saveReader(@Valid @RequestBody Reader reader) {
-        var readerToSave = readerService.addNewReader(reader);
+        var savedReader = readerService.addNewReader(reader);
         return ResponseEntity
                 .created(URI.create(String.format("/reader/%d", reader.getId())))
-                .body(readerToSave);
+                .body(savedReader);
     }
 
     @GetMapping("/{id}")

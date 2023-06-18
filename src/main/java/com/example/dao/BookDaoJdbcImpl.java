@@ -151,4 +151,5 @@ public class BookDaoJdbcImpl implements BookDao {
             throw new DAOException("Database error, during deleting book by book id!" + "\nError details: " + e.getMessage());
         }
     }
+
 }

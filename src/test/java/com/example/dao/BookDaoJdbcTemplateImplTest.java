@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class BookDaoJdbcTemplateImplTest {
     private JdbcTemplate jdbcTemplate;
     private BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
-    @Autowired
-    public BookDaoJdbcTemplateImplTest(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        bookDaoJdbcTemplate = new BookDaoJdbcTemplateImpl(dataSource);
-    }
+//    @Autowired
+//    public BookDaoJdbcTemplateImplTest(DataSource dataSource) {
+//        jdbcTemplate = new JdbcTemplate(dataSource);
+//        bookDaoJdbcTemplate = new BookDaoJdbcTemplateImpl(dataSource);
+//    }
 
     @Test
     void findAll() {

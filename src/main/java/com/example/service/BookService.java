@@ -26,8 +26,12 @@ public class BookService {
         return bookDaoJdbcTemplate.findById(id);
     }
 
-    public void updateReaderByBookId (long id) {
-        bookDaoJdbcTemplate.borrowBookToReader(id, 1);
+    public void borrowBookToReader (long bookId, long readerId) {
+        bookDaoJdbcTemplate.borrowBookToReader(bookId, readerId);
+    }
+
+    public void returnBook (long bookId) {
+        bookDaoJdbcTemplate.returnBookToLibrary(bookId);
     }
 
     public List<Book> getBooksByReaderId (long readerId) {

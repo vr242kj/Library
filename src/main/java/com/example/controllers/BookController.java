@@ -1,11 +1,14 @@
 package com.example.controllers;
 
+import com.example.dao.DAOException;
 import com.example.entity.Book;
 import com.example.entity.Reader;
 import com.example.service.BookService;
 import com.example.service.ReaderService;
+import com.example.service.ServiceException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,10 +46,10 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
-        var bookToSave = bookService.addNewBook(book);
+        var savedBook = bookService.addNewBook(book);
         return ResponseEntity
                 .created(URI.create(String.format("/book/%d", book.getId())))
-                .body(bookToSave);
+                .body(savedBook);
     }
 
     @GetMapping("/{id}")
@@ -61,10 +64,28 @@ public class BookController {
         return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{bookId}")
-    public ResponseEntity<String> returnBookToLibrary(@PathVariable long bookId) {
-        bookService.updateReaderByBookId(bookId);
-        return ResponseEntity.ok("Book availability updated");
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBookAvailability(@RequestBody Book newBook, @PathVariable long id) {
+        Optional<Book> book = bookService.findByBookId(id);
+
+        if (book.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (newBook.getReaderId() == 0) {
+            bookService.returnBook(id);
+           return ResponseEntity.ok(bookService.findByBookId(id).get());
+        }
+
+        Optional<Reader> reader = readerService.findByReaderId(id);
+
+        if (reader.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        bookService.borrowBookToReader(id, newBook.getReaderId());
+
+        return ResponseEntity.ok(bookService.findByBookId(id).get());
     }
 
     @DeleteMapping("/{id}")

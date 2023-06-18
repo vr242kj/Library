@@ -4,9 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Reader  {
+public class Reader {
     @NotNull
     private long id;
     @NotBlank(message = "Name is required")
