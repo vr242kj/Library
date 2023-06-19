@@ -14,6 +14,9 @@ public class BookService {
     @Autowired
     BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
 
+    @Autowired
+    ReaderService readerService;
+
     public List<Book> findAllBooks () {
         return bookDaoJdbcTemplate.findAll();
     }
@@ -32,6 +35,24 @@ public class BookService {
 
     public void returnBook (long bookId) {
         bookDaoJdbcTemplate.returnBookToLibrary(bookId);
+    }
+
+    public void updateBook (Book newBook, long bookId) {
+        bookDaoJdbcTemplate.findById(bookId)
+                .orElseThrow(() -> new ServiceException(String.format("Book with ID %d does not exist. Failed to update", bookId)));
+
+        long readerId = newBook.getReaderId();
+
+        if (readerId == 0) {
+            returnBook(bookId);
+            return;
+        }
+
+        readerService.findByReaderId(readerId)
+                .orElseThrow(() -> new ServiceException(String.format("Reader with ID %d does not exist. "
+                        + "Failed to borrow the book ID %d", readerId, bookId)));;
+
+        borrowBookToReader(bookId, readerId);
     }
 
     public List<Book> getBooksByReaderId (long readerId) {

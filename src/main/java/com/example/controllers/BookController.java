@@ -1,23 +1,13 @@
 package com.example.controllers;
 
-import com.example.dao.DAOException;
 import com.example.entity.Book;
 import com.example.entity.Reader;
 import com.example.service.BookService;
 import com.example.service.ReaderService;
-import com.example.service.ServiceException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -66,26 +56,8 @@ public class BookController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Book> updateBookAvailability(@RequestBody Book newBook, @PathVariable long id) {
-        Optional<Book> book = bookService.findByBookId(id);
-
-        if (book.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (newBook.getReaderId() == 0) {
-            bookService.returnBook(id);
-           return ResponseEntity.ok(bookService.findByBookId(id).get());
-        }
-
-        Optional<Reader> reader = readerService.findByReaderId(id);
-
-        if (reader.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        bookService.borrowBookToReader(id, newBook.getReaderId());
-
-        return ResponseEntity.ok(bookService.findByBookId(id).get());
+        bookService.updateBook(newBook, id);
+        return ResponseEntity.ok(newBook);
     }
 
     @DeleteMapping("/{id}")

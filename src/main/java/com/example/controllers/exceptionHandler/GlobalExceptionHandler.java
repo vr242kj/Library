@@ -1,5 +1,7 @@
 package com.example.controllers.exceptionHandler;
 
+import com.example.service.ServiceException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +22,13 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errors);
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ServiceException ex) {
+        String errorMessage = "An error occurred: " + ex.getMessage();
+        ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(Exception.class)

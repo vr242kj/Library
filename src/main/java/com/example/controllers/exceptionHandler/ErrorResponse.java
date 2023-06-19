@@ -30,4 +30,5 @@ public class ErrorResponse {
     public List<ErrorDetail> getErrors() {
         return errors;
     }
+
 }
