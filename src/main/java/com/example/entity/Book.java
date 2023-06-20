@@ -69,6 +69,10 @@ public class Book {
         return author;
     }
 
+    public long getReaderId() {
+        return readerId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

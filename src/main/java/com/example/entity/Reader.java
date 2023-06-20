@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Pattern;
 
 import java.util.Objects;
 
-public class Reader  {
+public class Reader {
     @NotNull
     private long id;
     @NotBlank(message = "Name is required")

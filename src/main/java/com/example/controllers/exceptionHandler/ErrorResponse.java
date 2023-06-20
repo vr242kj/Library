@@ -1,9 +1,12 @@
 package com.example.controllers.exceptionHandler;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
     private final LocalDateTime dateTime;
     private List<ErrorDetail> errors;
@@ -30,4 +33,5 @@ public class ErrorResponse {
     public List<ErrorDetail> getErrors() {
         return errors;
     }
+
 }

@@ -1,36 +1,69 @@
 package com.example.controllers;
 
-import com.example.dao.BookDao;
 import com.example.entity.Book;
-import com.example.service.ServiceException;
+import com.example.entity.Reader;
+import com.example.service.BookService;
+import com.example.service.ReaderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/books")
 public class BookController {
 
     @Autowired
-    private BookDao bookDao;
+    private ReaderService readerService;
 
-    @GetMapping("/books")
+    @Autowired
+    private BookService bookService;
+
+    @GetMapping
     public ResponseEntity<List<Book>> getAllBooks() {
-        var books = bookDao.findAll();
+        var books = bookService.findAllBooks();
+
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(books);
     }
 
-    @PostMapping("/books")
+    @PostMapping
     public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
-        var bookToSave = bookDao.save(book);
+        var savedBook = bookService.addNewBook(book);
         return ResponseEntity
                 .created(URI.create(String.format("/book/%d", book.getId())))
-                .body(bookToSave);
+                .body(savedBook);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable long id) {
+        Optional<Book> book = bookService.findByBookId(id);
+        return book.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{bookId}/readers")
+    public ResponseEntity<Reader> getReaderByBookId(@PathVariable long bookId) {
+        Optional<Reader> reader = readerService.getReaderByBookId(bookId);
+        return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBookAvailability(@RequestBody Book newBook, @PathVariable long id) {
+        bookService.updateBook(newBook, id);
+        return ResponseEntity.ok(newBook);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBookById(@PathVariable long id) {
+        bookService.deleteBookById(id);
+        return ResponseEntity.ok("Book deleted successfully.");
+    }
+
 }
