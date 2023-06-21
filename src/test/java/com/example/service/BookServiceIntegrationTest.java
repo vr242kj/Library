@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest
 @ConfigurationPropertiesScan("src/test/resources/application-test.yml")
@@ -26,9 +27,17 @@ public class BookServiceIntegrationTest {
 
     @Test
     public void testFindAllBooks() {
-        List<Book> repoBooks = bookDaoJdbcTemplate.findAll();
-        List<Book> serviceBooks = bookService.findAllBooks();
+        List<Book> expectedBooks = List.of(
+                new Book(1,"In Search of Lost Time", "Marcel Proust"),
+                new Book(2, "Ulysses", "James Joyce"),
+                new Book(3, "Don Quixote", "Miguel de Cervantes")
+        );
 
-        assertEquals(serviceBooks, repoBooks);
+        List<Book> actualBooks = bookService.findAllBooks();
+
+        assertEquals(3, actualBooks.size());
+
+        assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
     }
+
 }
