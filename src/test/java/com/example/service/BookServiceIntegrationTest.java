@@ -1,6 +1,5 @@
 package com.example.service;
 
-import com.example.dao.BookDaoJdbcTemplateImpl;
 import com.example.entity.Book;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,6 @@ public class BookServiceIntegrationTest {
 
     @Autowired
     private BookService bookService;
-
-    @Autowired
-    private BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
 
     @Test
     public void testFindAllBooks() {
