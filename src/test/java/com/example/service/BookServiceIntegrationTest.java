@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -33,13 +34,14 @@ public class BookServiceIntegrationTest {
 
     @BeforeEach
     public void setUp() {
-        jdbcTemplate.execute("INSERT INTO book (name, author) VALUES ('In Search of Lost Time', 'Marcel Proust')");
-        jdbcTemplate.execute("INSERT INTO book (name, author) VALUES ('Ulysses', 'James Joyce')");
-        jdbcTemplate.execute("INSERT INTO book (name, author) VALUES ('Don Quixote', 'Miguel de Cervantes')");
-
         expectedBooks.add(new Book(1,"In Search of Lost Time", "Marcel Proust"));
         expectedBooks.add(new Book(2, "Ulysses", "James Joyce"));
         expectedBooks.add(new Book(3, "Don Quixote", "Miguel de Cervantes"));
+
+        for (Book book : expectedBooks) {
+            jdbcTemplate.update("INSERT INTO book (name, author) VALUES (?, ?)",
+                    book.getName(), book.getAuthor());
+        }
     }
 
     @AfterEach
