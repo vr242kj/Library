@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS reader;
+DROP TABLE IF EXISTS reader CASCADE;
 
 CREATE TABLE reader (
                        id SERIAL PRIMARY KEY,
