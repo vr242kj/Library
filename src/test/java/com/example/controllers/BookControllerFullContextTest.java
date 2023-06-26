@@ -1,6 +1,11 @@
 package com.example.controllers;
 
 import com.example.entity.Book;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -13,6 +18,9 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Objects;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
@@ -29,10 +37,19 @@ class BookControllerFullContextTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
     private final Book expectedBook = new Book(1, "Don Quixote", "Miguel de Cervantes");
 
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
+        RestAssured.basePath = "/book-library/api/v1/books";
+    }
+
     @Test
-    void saveBook_TestControllerReturn() throws Exception {
+    void saveBook() throws Exception {
         ResponseEntity<Book> responseEntity = this.restTemplate
                 .postForEntity("http://localhost:" + port + "/book-library/api/v1/books", expectedBook, Book.class);
 
@@ -47,6 +64,22 @@ class BookControllerFullContextTest {
                 .stream().findFirst().orElseThrow(() -> new Exception("This book id doesn't exist"));
 
         assertEquals(expectedBook, bookInDB);
+    }
+
+    @Test
+    void saveBook_withRestAssure() throws JsonProcessingException {
+        Book book = new Book("Don Quixote", "Miguel de Cervantes");
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(book)
+                .when()
+                .post()
+                .then()
+                .statusCode(201)
+                .body("id", notNullValue())
+                .body("name", equalTo(book.getName()))
+                .body("author", equalTo(book.getAuthor()));
     }
 
 }
