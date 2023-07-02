@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.dao.BookDaoJdbcTemplateImpl;
 import com.example.entity.Book;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ class BookServiceUnitTest {
     private BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
 
     @Test
+    @DisplayName("Should retrieve all books and be equal to expected books")
     void findAllBooks() {
         List<Book> actualBooks = List.of(
                 new Book(1, "XXX", "XXX"),

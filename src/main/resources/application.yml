@@ -5,7 +5,7 @@ spring:
   # Database
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:7777/library
+    url: jdbc:postgresql://localhost:5436/library
     username: postgres
     password: Olimp123
 # Server configuration

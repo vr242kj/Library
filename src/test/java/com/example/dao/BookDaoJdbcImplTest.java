@@ -1,8 +1,5 @@
-package dao;
+package com.example.dao;
 
-import com.example.dao.BookDao;
-import com.example.dao.BookDaoJdbcImpl;
-import com.example.dao.DAOException;
 import com.example.entity.Book;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +9,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BookDaoJdbcImplTest {
 

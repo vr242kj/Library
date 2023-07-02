@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.entity.Book;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -49,7 +50,8 @@ public class BookServiceIntegrationTest {
     }
 
     @Test
-    public void testFindAllBooks() {
+    @DisplayName("Should retrieve all books and be equal to expected books")
+    public void findAllBooks() {
         List<Book> actualBooks = bookService.findAllBooks();
 
         assertEquals(3, actualBooks.size());

@@ -1,10 +1,11 @@
 package com.example.controllers;
 
 import com.example.entity.Book;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,47 +39,44 @@ class BookControllerFullContextTest {
     }
 
     @Test
+    @DisplayName("Should save new book, create Location and be the same as book in database")
     void saveBook() throws Exception {
         Book expectedBook = new Book(1, "Don Quixote", "Miguel de Cervantes");
 
+        ExtractableResponse<Response> response =
+                    given()
+                        .contentType("application/json")
+                        .body(new Book("Don Quixote", "Miguel de Cervantes"))
+                    .when()
+                        .post()
+                    .then()
+                        .statusCode(201)
+                        .extract();
+
         int userId =
-                given().
-                        contentType("application/json").
-                        body(expectedBook).
-                        when().
-                        post().
-                        then().
-                        statusCode(201).
-                        extract().
-                        path("id");
+                when()
+                    .get(response.header("Location"))
+                .then()
+                    .statusCode(200)
+                    .body("id", notNullValue())
+                    .body("name", equalTo(expectedBook.getName()))
+                    .body("author", equalTo(expectedBook.getAuthor()))
+                    .extract()
+                    .path("id");
 
-        assertEquals(expectedBook.getId(), userId);
+        Book bookInDB = retrieveCreatedBookInDb(userId);
 
-        Book bookInDB = jdbcTemplate.query("select * from book where id = ?",
+        assertEquals(expectedBook, bookInDB);
+    }
+
+    private Book retrieveCreatedBookInDb(int userId) throws Exception {
+        return jdbcTemplate.query("select * from book where id = ?",
                         (resultSet, rowNum) -> new Book(
                                 resultSet.getInt("id"),
                                 resultSet.getString("name"),
                                 resultSet.getString("author")
                         ), userId)
                 .stream().findFirst().orElseThrow(() -> new Exception("This book id doesn't exist"));
-
-        assertEquals(expectedBook, bookInDB);
-    }
-
-    @Test
-    void saveBook_withRestAssure() throws JsonProcessingException {
-        Book book = new Book("Don Quixote", "Miguel de Cervantes");
-
-        given()
-                .contentType(ContentType.JSON)
-                .body(book)
-                .when()
-                .post()
-                .then()
-                .statusCode(201)
-                .body("id", notNullValue())
-                .body("name", equalTo(book.getName()))
-                .body("author", equalTo(book.getAuthor()));
     }
 
 }

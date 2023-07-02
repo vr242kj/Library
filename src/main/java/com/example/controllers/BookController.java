@@ -45,7 +45,7 @@ public class BookController {
     public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
         var savedBook = bookService.addNewBook(book);
         return ResponseEntity
-                .created(URI.create(String.format("/book/%d", book.getId())))
+                .created(URI.create(String.format("/%d", book.getId())))
                 .body(savedBook);
     }
 
