@@ -7,7 +7,14 @@ import com.example.service.ReaderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
@@ -38,7 +45,7 @@ public class BookController {
     public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
         var savedBook = bookService.addNewBook(book);
         return ResponseEntity
-                .created(URI.create(String.format("/book/%d", book.getId())))
+                .created(URI.create(String.format("/%d", book.getId())))
                 .body(savedBook);
     }
 
