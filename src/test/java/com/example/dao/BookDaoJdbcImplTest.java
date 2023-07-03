@@ -1,11 +1,15 @@
 package com.example.dao;
 
 import com.example.entity.Book;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Optional;
 
@@ -14,15 +18,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
+@SpringBootTest
+@AutoConfigureTestDatabase
+@Sql(value = "classpath:schema.sql", executionPhase = BEFORE_TEST_METHOD)
 class BookDaoJdbcImplTest {
 
-    private static BookDao bookDaoJdbcImpl;
-
-    @BeforeAll
-    public static void init(){
-        bookDaoJdbcImpl = new BookDaoJdbcImpl();
-    }
+    @Autowired
+    @Qualifier("bookDaoJdbcImpl")
+    private BookDao bookDaoJdbcImpl;
 
     @ParameterizedTest(name = "{index} ==> {2}")
     @DisplayName("Should throw DaoException when book name or/and author is null")
