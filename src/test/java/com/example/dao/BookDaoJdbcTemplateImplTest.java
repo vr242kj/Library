@@ -63,12 +63,12 @@ class BookDaoJdbcTemplateImplTest {
         var generatedId = bookDaoJdbcImpl.save(bookToSave).getId();
         assertTrue(generatedId > 0);
 
-        var savedBook = bookDaoJdbcImpl.findById(generatedId).get();
+        var savedBook = bookDaoJdbcImpl.findById(generatedId);
 
         assertAll(
                 () -> assertNotNull(savedBook),
-                () -> assertEquals(bookName, savedBook.getName()),
-                () -> assertEquals(bookAuthor, savedBook.getAuthor())
+                () -> assertEquals(bookName, savedBook.map(Book::getName).orElse(null)),
+                () -> assertEquals(bookAuthor, savedBook.map(Book::getAuthor).orElse(null))
         );
 
         bookDaoJdbcImpl.deleteById(generatedId);
