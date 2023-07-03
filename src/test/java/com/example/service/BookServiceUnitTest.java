@@ -24,7 +24,7 @@ class BookServiceUnitTest {
     private BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
 
     @Test
-    @DisplayName("Should retrieve all books and be equal to expected books")
+    @DisplayName("Should successfully retrieve all books")
     void findAllBooks() {
         List<Book> actualBooks = List.of(
                 new Book(1, "XXX", "XXX"),

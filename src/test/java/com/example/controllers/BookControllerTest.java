@@ -37,7 +37,11 @@ class BookControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"' ', ' '", "name, 111"})
+    @CsvSource(value = {"' ', ' '",
+                        "name, 111",
+                        " , author",
+                        "name, ",
+                        " , "})
     @DisplayName("Should return bad request when parameter book not valid")
     void saveBook_WhenParamBookNotValid_ThenReturnBadRequest(String name, String author) {
         given()

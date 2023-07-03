@@ -50,7 +50,7 @@ public class BookServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("Should retrieve all books and be equal to expected books")
+    @DisplayName("Should successfully retrieve all books")
     public void findAllBooks() {
         List<Book> actualBooks = bookService.findAllBooks();
 

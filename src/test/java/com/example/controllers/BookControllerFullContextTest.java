@@ -39,7 +39,7 @@ class BookControllerFullContextTest {
     }
 
     @Test
-    @DisplayName("Should save new book, create Location and be the same as book in database")
+    @DisplayName("Should successfully save new book")
     void saveBook() throws Exception {
         Book expectedBook = new Book(1, "Don Quixote", "Miguel de Cervantes");
 
