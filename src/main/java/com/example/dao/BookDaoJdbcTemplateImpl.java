@@ -156,7 +156,11 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
     @Override
     public void deleteById(long id) {
         try {
-            jdbcTemplate.update("delete from book where id = ?", id);
+            int rowsAffected = jdbcTemplate.update("delete from book where id = ?", id);
+
+            if (rowsAffected == 0) {
+                throw new DAOException("Book with ID " + id + " does not exist");
+            }
         } catch (DataAccessException ex) {
             logger.error("Failed to delete book with ID {}. Error details: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to delete book with ID " + id, ex);
@@ -175,4 +179,5 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
             throw new DAOException("Failed map resultSet to Book object!" + "\nError details: " + e.getMessage());
         }
     }
+
 }

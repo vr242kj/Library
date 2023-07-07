@@ -23,7 +23,5 @@ public class ConnectionUtilSpring {
         dataSource.setDriverClassName(Objects.requireNonNull(environment.getProperty("spring.datasource.driver-class-name")));
         return dataSource;
     }
+
 }
-
-
-
