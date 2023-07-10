@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/v1/books")
 @Tag(name = "Book API", description = "Endpoints for managing books")
 public class BookController {
 
