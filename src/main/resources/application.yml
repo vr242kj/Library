@@ -21,7 +21,18 @@ springdoc:
   api-docs:
     path: /api-docs
 
+info:
+  java:
+    version: ${java.version}
+  application:
+    name: Library
+    description: The application provides the ability to create two entities (book and reader),
+      as well as their interaction with each other.
+
 management:
+  info:
+    env:
+      enabled: true
   endpoints:
     web:
       exposure:

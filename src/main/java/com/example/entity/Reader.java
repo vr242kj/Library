@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class Reader {
     @NotNull
     private long id;
+
     @NotBlank(message = "Name is required")
     @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*",
             message = "Full name must be literal and one space between words (max 3 words)")

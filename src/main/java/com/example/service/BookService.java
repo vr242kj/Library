@@ -17,27 +17,27 @@ public class BookService {
     @Autowired
     ReaderService readerService;
 
-    public List<Book> findAllBooks() {
+    public List<Book> findAllBooks () {
         return bookDaoJdbcTemplate.findAll();
     }
 
-    public Book addNewBook(Book book) {
+    public Book addNewBook (Book book) {
         return bookDaoJdbcTemplate.save(book);
     }
 
-    public Optional<Book> findByBookId(long id) {
+    public Optional<Book> findByBookId (long id) {
         return bookDaoJdbcTemplate.findById(id);
     }
 
-    public void borrowBookToReader(long bookId, long readerId) {
+    public void borrowBookToReader (long bookId, long readerId) {
         bookDaoJdbcTemplate.borrowBookToReader(bookId, readerId);
     }
 
-    public void returnBook(long bookId) {
+    public void returnBook (long bookId) {
         bookDaoJdbcTemplate.returnBookToLibrary(bookId);
     }
 
-    public void updateBook(Book newBook, long bookId) {
+    public void updateBook (Book newBook, long bookId) {
         bookDaoJdbcTemplate.findById(bookId)
                 .orElseThrow(() -> new ServiceException(String.format("Book with ID %d does not exist. Failed to update", bookId)));
 
@@ -55,11 +55,11 @@ public class BookService {
         borrowBookToReader(bookId, readerId);
     }
 
-    public List<Book> getBooksByReaderId(long readerId) {
+    public List<Book> getBooksByReaderId (long readerId) {
         return bookDaoJdbcTemplate.findAllByReaderId(readerId);
     }
 
-    public void deleteBookById(long id) {
+    public void deleteBookById (long id) {
         bookDaoJdbcTemplate.deleteById(id);
     }
 

@@ -37,5 +37,5 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(LocalDateTime.now(), errorMessage);
         return ResponseEntity.badRequest().body(response);
     }
-
 }
+
