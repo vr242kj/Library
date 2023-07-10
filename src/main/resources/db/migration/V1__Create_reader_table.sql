@@ -1,4 +1,4 @@
-CREATE TABLE reader (
+CREATE TABLE IF NOT EXISTS reader (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL
 );
