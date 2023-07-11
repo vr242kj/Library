@@ -2,10 +2,12 @@ package com.example.controllers.exceptionHandler;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
     private final LocalDateTime dateTime;
@@ -20,18 +22,6 @@ public class ErrorResponse {
     public ErrorResponse(LocalDateTime dateTime, String errorMessage) {
         this.dateTime = dateTime;
         this.errorMessage = errorMessage;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public List<ErrorDetail> getErrors() {
-        return errors;
     }
 
 }

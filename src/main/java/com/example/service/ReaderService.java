@@ -14,25 +14,24 @@ public class ReaderService {
     @Autowired
     ReaderDaoJdbcTemplateImpl readerDaoJdbcTemplate;
 
-    public List<Reader> findAllReaders () {
+    public List<Reader> findAllReaders() {
         return readerDaoJdbcTemplate.findAll();
     }
 
-    public Reader addNewReader (Reader reader) {
+    public Reader addNewReader(Reader reader) {
         return readerDaoJdbcTemplate.save(reader);
     }
 
-    public Optional<Reader> findByReaderId (long id) {
+    public Optional<Reader> findByReaderId(long id) {
         return readerDaoJdbcTemplate.findById(id);
     }
 
-    public Optional<Reader> getReaderByBookId (long bookId) {
+    public Optional<Reader> getReaderByBookId(long bookId) {
         return readerDaoJdbcTemplate.findByBookId(bookId);
     }
 
-    public void deleteReaderById (long id) {
+    public void deleteReaderById(long id) {
         readerDaoJdbcTemplate.deleteById(id);
     }
-
 
 }

@@ -1,52 +1,35 @@
 package com.example.service;
 
 import com.example.entity.Book;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@Sql(value = "classpath:schema.sql", executionPhase = BEFORE_TEST_METHOD)
 public class BookServiceIntegrationTest {
 
     @Autowired
     private BookService bookService;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     private List<Book> expectedBooks = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
-        expectedBooks.add(new Book(1,"In Search of Lost Time", "Marcel Proust"));
-        expectedBooks.add(new Book(2, "Ulysses", "James Joyce"));
-        expectedBooks.add(new Book(3, "Don Quixote", "Miguel de Cervantes"));
-
-        for (Book book : expectedBooks) {
-            jdbcTemplate.update("INSERT INTO book (name, author) VALUES (?, ?)",
-                    book.getName(), book.getAuthor());
-        }
-    }
-
-    @AfterEach
-    public void tearDown() {
-        jdbcTemplate.execute("DROP TABLE book");
-        expectedBooks.clear();
+        expectedBooks.add(new Book(1,"In Search of Lost Time", "Marcel Proust", 1));
+        expectedBooks.add(new Book(2, "Ulysses", "James Joyce", 3));
+        expectedBooks.add(new Book(3, "Don Quixote", "Miguel de Cervantes", 3));
+        expectedBooks.add(new Book(4, "Moby Dick", "Herman Melville"));
+        expectedBooks.add(new Book(5, "Hamlet", "William Shakespeare"));
     }
 
     @Test
@@ -54,7 +37,7 @@ public class BookServiceIntegrationTest {
     public void findAllBooks() {
         List<Book> actualBooks = bookService.findAllBooks();
 
-        assertEquals(3, actualBooks.size());
+        assertEquals(5, actualBooks.size());
 
         assertThat(actualBooks).containsExactlyElementsOf(expectedBooks);
     }
