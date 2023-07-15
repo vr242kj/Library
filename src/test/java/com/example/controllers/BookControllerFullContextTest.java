@@ -12,17 +12,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
 @AutoConfigureTestDatabase
-@Sql(value = "classpath:schema.sql", executionPhase = BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BookControllerFullContextTest {
 
@@ -41,7 +38,7 @@ class BookControllerFullContextTest {
     @Test
     @DisplayName("Should successfully save new book")
     void saveBook() throws Exception {
-        Book expectedBook = new Book(1, "Don Quixote", "Miguel de Cervantes");
+        Book expectedBook = new Book(6, "Don Quixote", "Miguel de Cervantes");
 
         ExtractableResponse<Response> response =
                     given()

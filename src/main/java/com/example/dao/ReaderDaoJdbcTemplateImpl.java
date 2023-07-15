@@ -15,7 +15,11 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 @Repository
@@ -148,7 +152,11 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
     @Override
     public void deleteById(long id) {
         try {
-            jdbcTemplate.update("delete from reader where id = ?", id);
+            int rowsAffected = jdbcTemplate.update("delete from reader where id = ?", id);
+
+            if (rowsAffected == 0) {
+                throw new DAOException("Reader with ID " + id + " does not exist");
+            }
         } catch (DataAccessException ex) {
             logger.error("Failed to delete reader with ID {}. Error details: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to delete reader with ID " + id, ex);
@@ -165,4 +173,5 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
             throw new DAOException("Failed to map resultSet to Reader object!" + "\nError details: " + e.getMessage());
         }
     }
+
 }
