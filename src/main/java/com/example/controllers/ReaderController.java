@@ -1,6 +1,5 @@
 package com.example.controllers;
 
-import com.example.entity.Book;
 import com.example.entity.Reader;
 import com.example.service.BookService;
 import com.example.service.ReaderService;
@@ -86,24 +85,6 @@ public class ReaderController {
             @PathVariable @Parameter(description = "The ID of the reader") long id) {
         Optional<Reader> reader = readerService.findByReaderId(id);
         return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Get books by reader ID", description = "Retrieves books associated with a reader by its ID")
-    @ApiResponse(responseCode = "200", description = "Successful operation",
-            content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = "{\"id\":1,\"name\":\"Book 1\","
-                    + "\"author\":\"Author 1\", \"id\":1}")))
-    @ApiResponse(responseCode = "204", description = "No Content", content = @Content)
-    @GetMapping("/{readerId}/books")
-    public ResponseEntity<List<Book>> getBooksByReaderId(
-            @PathVariable @Parameter(description = "The ID of the reader") long readerId) {
-        List<Book> books = bookService.getBooksByReaderId(readerId);
-
-        if (books.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(books);
     }
 
     @Operation(summary = "Delete a reader by ID", description = "Deletes a reader by its ID")

@@ -26,10 +26,6 @@ public class ReaderService {
         return readerDaoJdbcTemplate.findById(id);
     }
 
-    public Optional<Reader> getReaderByBookId(long bookId) {
-        return readerDaoJdbcTemplate.findByBookId(bookId);
-    }
-
     public void deleteReaderById(long id) {
         readerDaoJdbcTemplate.deleteById(id);
     }

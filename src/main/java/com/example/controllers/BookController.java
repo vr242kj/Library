@@ -1,9 +1,7 @@
 package com.example.controllers;
 
 import com.example.entity.Book;
-import com.example.entity.Reader;
 import com.example.service.BookService;
-import com.example.service.ReaderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +28,6 @@ import java.util.Optional;
 @RequestMapping("/api/v1/books")
 @Tag(name = "Book API", description = "Endpoints for managing books")
 public class BookController {
-
-    @Autowired
-    private ReaderService readerService;
 
     @Autowired
     private BookService bookService;
@@ -91,40 +85,6 @@ public class BookController {
             @PathVariable @Parameter(description = "The ID of the book") long id) {
         Optional<Book> book = bookService.findByBookId(id);
         return book.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Get reader by book ID", description = "Retrieves the reader of a book by its ID")
-    @ApiResponse(responseCode = "200", description = "Successful operation",
-            content = @Content(mediaType = "application/json",
-                    examples = @ExampleObject(value = "{\"id\":1, \"name\":\"Gabriel Garcia Marquez\"}")))
-    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
-    @GetMapping("/{bookId}/readers")
-    public ResponseEntity<Reader> getReaderByBookId(
-            @PathVariable @Parameter(description = "The ID of the book") long bookId) {
-        Optional<Reader> reader = readerService.getReaderByBookId(bookId);
-        return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Update book availability", description = "Updates the availability of a book")
-    @ApiResponse(responseCode = "200", description = "Successful operation",
-            content = @Content(mediaType = "application/json",
-                    examples = @ExampleObject(value = "{\"id\": 0, \"name\": null,"
-                            + " \"author\": null, \"readerId\": 1}")))
-    @ApiResponse(responseCode = "404", description = "Not Found",
-            content = @Content(mediaType = "application/json",
-                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
-                            + "\"errorMessage\":\"An error occurred: Book with ID 1 does not exist. Failed to update\"}")))
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Details of the Item to be created",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    examples = {@ExampleObject(value = "{\"readerId\": 1}")}))
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBookAvailability(
-            @RequestBody @Parameter(description = "The updated book information") Book newBook,
-            @PathVariable  @Parameter(description = "The ID of the book") long id) {
-        bookService.updateBook(newBook, id);
-        return ResponseEntity.ok(newBook);
     }
 
     @Operation(summary = "Delete a book by ID", description = "Deletes a book by its ID")
