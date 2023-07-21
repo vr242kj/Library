@@ -14,7 +14,8 @@ spring:
 
 library:
   minAgeForRestrictedBooks: ${MIN_AGE_FOR_RESTRICTED_BOOK:18}
-  maxBooksForBorrow: ${MAX_BOOKS_FOR_BORROW:2}
+  maxBooksForBorrow: ${MAX_BOOKS_FOR_BORROW:4}
+  defaultMaxBorrowTimeInDays: ${DEFAULT_MAX_BORROW_TIME_IN_DAYS:14}
 
 # Server configuration
 server:

@@ -40,4 +40,8 @@ public class Book {
         }
     }
 
+    public void setMaxBorrowTimeInDay(int maxBorrowTimeInDay) {
+        this.maxBorrowTimeInDay = maxBorrowTimeInDay;
+    }
+
 }
