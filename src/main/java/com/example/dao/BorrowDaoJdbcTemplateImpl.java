@@ -34,7 +34,7 @@ public class BorrowDaoJdbcTemplateImpl implements BorrowDao {
                 select borrow.id, borrow.bookId, borrow.readerId,
                 borrow.borrowStartDate, borrow.borrowEndDate,
                 borrow.borrowStartDate + book.maxBorrowTimeInDays as expectedReturn
-                from borrow inner join book 
+                from borrow inner join book
                     on borrow.bookId = book.id
                 """;
 
@@ -52,8 +52,8 @@ public class BorrowDaoJdbcTemplateImpl implements BorrowDao {
                 select borrow.id, borrow.bookId, borrow.readerId,
                     borrow.borrowStartDate, borrow.borrowEndDate,
                     borrow.borrowStartDate + book.maxBorrowTimeInDays as expectedReturn
-                from borrow inner join book 
-                    on borrow.bookId = book.id 
+                from borrow inner join book
+                    on borrow.bookId = book.id
                 where borrow.id = ?
                 """;
 

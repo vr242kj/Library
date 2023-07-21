@@ -51,7 +51,7 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
 
     @Override
     public Book save(Book bookToSave) {
-        String SQL_INSERT = "insert into book(name, author) values(?, ?)";
+        String SQL_INSERT = "insert into book(name, author, maxborrowtimeindays, restricted) values(?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -60,6 +60,8 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                 var ps = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, bookToSave.getName());
                 ps.setString(2, bookToSave.getAuthor());
+                ps.setInt(3, bookToSave.getMaxBorrowTimeInDay());
+                ps.setBoolean(4, bookToSave.isRestricted());
                 return ps;
             }, keyHolder);
         } catch (DataAccessException ex) {

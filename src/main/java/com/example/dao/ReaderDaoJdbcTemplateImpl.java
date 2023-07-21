@@ -52,7 +52,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
 
     @Override
     public Reader save(Reader readerToSave) {
-        String SQL_INSERT = "insert into reader(name) values(?)";
+        String SQL_INSERT = "insert into reader(name, birthdate) values(?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -60,6 +60,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
             jdbcTemplate.update(connection -> {
                 var ps = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, readerToSave.getName());
+                ps.setDate(2, Date.valueOf(readerToSave.getBirthdate()));
                 return ps;
             }, keyHolder);
         } catch (DataAccessException ex) {
