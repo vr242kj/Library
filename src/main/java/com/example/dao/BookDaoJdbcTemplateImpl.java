@@ -100,7 +100,9 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
             return new Book(
                     rs.getInt("id"),
                     rs.getString("name"),
-                    rs.getString("author")
+                    rs.getString("author"),
+                    rs.getInt("maxborrowtimeindays"),
+                    rs.getBoolean("restricted")
             );
         } catch (SQLException e) {
             throw new DAOException("Failed map resultSet to Book object!" + "\nError details: " + e.getMessage());

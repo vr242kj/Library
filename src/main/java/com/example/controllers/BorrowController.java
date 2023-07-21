@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/borrow")
+@RequestMapping("/api/v1/borrows")
 public class BorrowController {
 
     @Autowired

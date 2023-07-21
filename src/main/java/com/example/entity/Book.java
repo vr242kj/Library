@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -25,7 +26,9 @@ public class Book {
     @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*",
             message = "Author must be literal")
     private String author;
-
+    int maxBorrowTimeInDay;
+    @NotNull
+    boolean restricted;
     public Book(String name, String author) {
         this.name = name;
         this.author = author;

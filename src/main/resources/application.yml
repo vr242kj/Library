@@ -13,8 +13,8 @@ spring:
     locations: classpath:db/migration
 
 library:
-  minAgeForRestrictedBooks: ${MIN_AGE_FOR_RESTRICTED_BOOK}
-  maxBooksForBorrow: ${MAX_BOOKS_FOR_BORROW}
+  minAgeForRestrictedBooks: ${MIN_AGE_FOR_RESTRICTED_BOOK:18}
+  maxBooksForBorrow: ${MAX_BOOKS_FOR_BORROW:2}
 
 # Server configuration
 server:

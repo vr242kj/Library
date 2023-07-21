@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -20,6 +22,7 @@ public class Reader {
     @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*",
             message = "Full name must be literal and one space between words (max 3 words)")
     private String name;
+    private LocalDate birthdate;
 
     public Reader(String name) {
         this.name = name;

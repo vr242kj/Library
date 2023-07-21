@@ -3,7 +3,6 @@ package com.example.dao;
 import com.example.entity.Borrow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -29,14 +28,18 @@ public class BorrowDaoJdbcTemplateImpl implements BorrowDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Value( "${library.minAgeForRestrictedBooks:18}" )
-    private int minAgeForRestrictedBooks;
-
     @Override
     public List<Borrow> findAll() {
+        String SQL_QUERY = """
+                select borrow.id, borrow.bookId, borrow.readerId,
+                borrow.borrowStartDate, borrow.borrowEndDate,
+                borrow.borrowStartDate + book.maxBorrowTimeInDays as expectedReturn
+                from borrow inner join book 
+                    on borrow.bookId = book.id
+                """;
+
         try {
-            return jdbcTemplate.query("select * from borrow",
-                    this::mapToBorrow);
+            return jdbcTemplate.query(SQL_QUERY, this::mapToBorrow);
         } catch (DataAccessException ex) {
             logger.error("Failed to retrieval borrows from the database, due to DB internal error: {}", ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve borrows from the database.", ex);
@@ -45,10 +48,19 @@ public class BorrowDaoJdbcTemplateImpl implements BorrowDao {
 
     @Override
     public Optional<Borrow> findById(long id) {
+        String SQL_QUERY = """
+                select borrow.id, borrow.bookId, borrow.readerId,
+                    borrow.borrowStartDate, borrow.borrowEndDate,
+                    borrow.borrowStartDate + book.maxBorrowTimeInDays as expectedReturn
+                from borrow inner join book 
+                    on borrow.bookId = book.id 
+                where borrow.id = ?
+                """;
+
         try {
-            return jdbcTemplate.query("select * from borrow where id = ?",
-                            this::mapToBorrow, id)
-                    .stream().findFirst();
+            return jdbcTemplate.query(SQL_QUERY, this::mapToBorrow, id)
+                    .stream()
+                    .findFirst();
         } catch (DataAccessException ex) {
             logger.error("Failed to retrieve borrow with id {} from the database, due to DB internal error: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve borrow from the database.", ex);
@@ -89,78 +101,6 @@ public class BorrowDaoJdbcTemplateImpl implements BorrowDao {
     }
 
     @Override
-    public Optional<Integer> countAllByReaderId(long readerId) {
-        try {
-            Integer count = jdbcTemplate.queryForObject(
-                    "select count(id) from borrow where readerId = ? and borrowEndDate is null", Integer.class, readerId);
-
-            return Optional.ofNullable(count);
-        } catch (DataAccessException ex) {
-            logger.error("Failed to count borrows by readerId: {}. Error details: {}", readerId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to count borrows by readerId: " + readerId, ex);
-        }
-    }
-
-    @Override
-    public Optional<Integer> isReaderExpiredMaximumBorrowedTime(long readerId) {
-        String SQL_COUNT_READERS_WITH_EXPIRED_TIME = """
-                select 
-                    count(DISTINCT borrow.id)
-                from borrow 
-                    inner join book on borrow.bookId = book.id
-                where borrow.borrowEndDate IS NULL and borrow.borrowStartDate + book.maxBorrowTimeInDays < CURRENT_DATE
-                  and readerId = ?;
-                """;
-
-        try {
-            Integer countDistinctBorrowId = jdbcTemplate.queryForObject(
-                    SQL_COUNT_READERS_WITH_EXPIRED_TIME,
-                    Integer.class,
-                    readerId);
-
-            return Optional.ofNullable(countDistinctBorrowId);
-        } catch (DataAccessException ex) {
-            logger.error("Failed to count borrows by readerId: {}. Error details: {}", readerId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to count borrows by readerId: " + readerId, ex);
-        }
-    }
-
-    @Override
-    public Optional<Integer> isAdultToBorrowRestrictedBook(long readerId) {
-        String SQL_COUNT_READERS_WITH_EXPIRED_TIME = """
-                select
-                    date_part('year', age(current_date, reader.birthdate)) - ?
-                from reader
-                where reader.id = ?;
-                """;
-
-        try {
-            Integer countDifference =  jdbcTemplate.queryForObject(SQL_COUNT_READERS_WITH_EXPIRED_TIME,
-                            Integer.class,
-                            minAgeForRestrictedBooks,
-                            readerId);
-
-            return Optional.ofNullable(countDifference);
-        } catch (DataAccessException ex) {
-            logger.error("Failed to count borrows by readerId: {}. Error details: {}", readerId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to count borrows by readerId: " + readerId, ex);
-        }
-    }
-
-    @Override
-    public Optional<Integer> isBookAvailable(long bookId) {
-        try {
-            Integer countBorrowId = jdbcTemplate.queryForObject(
-            "select count(id) from borrow where bookId = ? and borrowEndDate is null ", Integer.class, bookId);
-
-            return Optional.ofNullable(countBorrowId);
-        } catch (DataAccessException ex) {
-            logger.error("Failed to count borrows by readerId: {}. Error details: {}", bookId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to count borrows by readerId: " + bookId, ex);
-        }
-    }
-
-    @Override
     public void deleteById(long id) {
         try {
             int rowsAffected = jdbcTemplate.update("delete from borrow where id = ?", id);
@@ -178,13 +118,15 @@ public class BorrowDaoJdbcTemplateImpl implements BorrowDao {
         try {
             Optional<Date> borrowStartDate = Optional.ofNullable(rs.getDate("borrowStartDate"));
             Optional<Date> borrowEndDate = Optional.ofNullable(rs.getDate("borrowEndDate"));
+            Optional<Date> expectedReturn = Optional.ofNullable(rs.getDate("expectedReturn"));
 
             return new Borrow(
                     rs.getInt("id"),
                     rs.getInt("bookId"),
                     rs.getInt("readerId"),
                     borrowStartDate.map(Date::toLocalDate).orElse(null),
-                    borrowEndDate.map(Date::toLocalDate).orElse(null)
+                    borrowEndDate.map(Date::toLocalDate).orElse(null),
+                    expectedReturn.map(Date::toLocalDate).orElse(null)
             );
         } catch (SQLException e) {
             throw new DAOException("Failed map resultSet to Borrow object!" + "\nError details: " + e.getMessage());

@@ -21,6 +21,7 @@ public class Borrow {
     private long readerId;
     private LocalDate borrowStartDate;
     private LocalDate borrowEndDate;
+    private LocalDate expectedReturn;
 
     public Borrow(long bookId, long readerId) {
         this.bookId = bookId;

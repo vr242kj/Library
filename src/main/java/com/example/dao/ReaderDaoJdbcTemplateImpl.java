@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -96,9 +97,12 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
 
     private Reader mapToReader(ResultSet rs, int rowNum) {
         try {
+            Optional<Date> birthdate = Optional.ofNullable(rs.getDate("birthdate"));
+
             return new Reader(
                     rs.getInt("id"),
-                    rs.getString("name")
+                    rs.getString("name"),
+                    birthdate.map(Date::toLocalDate).orElse(null)
             );
         } catch (SQLException e) {
             throw new DAOException("Failed to map resultSet to Reader object!" + "\nError details: " + e.getMessage());
