@@ -58,11 +58,12 @@ public class BorrowController {
                             + "\"borrowStartDate\": \"2023-07-24\", \"borrowEndDate\": null, \"expectedReturn\": \"2023-08-07\"}")))
     @ApiResponse(responseCode = "404", description = "Not Found",
             content = @Content(mediaType = "application/json",
-                    examples = {
-                            @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
-                                    + "\"errors\":[{\"fieldName\":\"name\", \"invalidValue\":\"9999\"" +
-                                    ",\"constraint\":\"This reader id doesn't exist\"}]}")
-                    }))
+                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
+                            + "\"errorMessage\":\"An error occurred: This book id doesn't exist\"}")))
+    @ApiResponse(responseCode = "400", description = "Bad Request",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
+                            + "\"errorMessage\":\"An error occurred: Rejected! Book isn't available\"}")))
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Details of the Item to be created",
             content = @Content(

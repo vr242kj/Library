@@ -115,7 +115,8 @@ public class BookController {
     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
     @ApiResponse(responseCode = "400", description = "Bad Request",
             content = @Content(mediaType = "application/json",
-                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\",\"errorMessage\":\"An error occurred: Book with ID 0 does not exist\"}")))
+                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
+                            + "\"errorMessage\":\"An error occurred: Book with ID 0 does not exist\"}")))
     @GetMapping("/{bookId}/borrow")
     public ResponseEntity<Borrow> getBorrowByBookId(@PathVariable long bookId) {
         Optional<Borrow> borrow = borrowService.getBorrowByBookId(bookId);

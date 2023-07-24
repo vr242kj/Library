@@ -6,6 +6,7 @@ import com.example.dao.ReaderDaoJdbcTemplateImpl;
 import com.example.entity.Book;
 import com.example.entity.Borrow;
 import com.example.entity.Reader;
+import com.example.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,12 +56,12 @@ public class BorrowService {
 
     private Reader getReaderByIdIfExist(long readerId) {
         return readerDaoJdbcTemplate.findById(readerId)
-                .orElseThrow(() -> new ServiceException("This reader id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("This reader id doesn't exist"));
     }
 
     private Book getBookByIdIfExist(long bookId) {
         return bookDaoJdbcTemplate.findById(bookId)
-                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("This book id doesn't exist"));
     }
 
     private void checkBorrowRules(Reader reader, Book  book) {
