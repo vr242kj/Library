@@ -1,9 +1,8 @@
 package com.example.dao;
 
 import com.example.entity.Reader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -17,13 +16,11 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
-
-    private static final Logger logger = LoggerFactory.getLogger(ReaderDaoJdbcTemplateImpl.class);
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public List<Reader> findAll() {
@@ -31,7 +28,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
             return jdbcTemplate.query("select * from reader",
                     this::mapToReader);
         } catch (DataAccessException ex) {
-            logger.error("Failed to retrieval reader from the database, due to DB internal error: {}", ex.getLocalizedMessage());
+            log.error("Failed to retrieval reader from the database, due to DB internal error: {}", ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve reader from the database.", ex);
         }
     }
@@ -43,7 +40,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
                             this::mapToReader, id)
                     .stream().findFirst();
         } catch (DataAccessException ex) {
-            logger.error("Failed to retrieve reader with id {} from the database, due to DB internal error: {}", id, ex.getLocalizedMessage());
+            log.error("Failed to retrieve reader with id {} from the database, due to DB internal error: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve reader from the database.", ex);
         }
     }
@@ -64,7 +61,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
                 return ps;
             }, keyHolder);
         } catch (DataAccessException ex) {
-            logger.error("Failed to create new book {} in DB, due to DB internal error: {}", readerToSave, ex.getLocalizedMessage());
+            log.error("Failed to create new book {} in DB, due to DB internal error: {}", readerToSave, ex.getLocalizedMessage());
             throw new DAOException("Failed to save new book: " + readerToSave.toString(), ex);
         }
 
@@ -74,7 +71,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
                 .ifPresentOrElse(
                         readerToSave::setId,
                         () -> {
-                            logger.error("Generated ID is null for reader: {}", readerToSave);
+                            log.error("Generated ID is null for reader: {}", readerToSave);
                             throw new DAOException("Failed to retrieve generated ID for reader: " + readerToSave);
                         }
                 );
@@ -91,7 +88,7 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
                 throw new DAOException("Reader with ID " + id + " does not exist");
             }
         } catch (DataAccessException ex) {
-            logger.error("Failed to delete reader with ID {}. Error details: {}", id, ex.getLocalizedMessage());
+            log.error("Failed to delete reader with ID {}. Error details: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to delete reader with ID " + id, ex);
         }
     }

@@ -1,7 +1,8 @@
 package com.example.controllers;
 
+import com.example.entity.Borrow;
 import com.example.entity.Reader;
-import com.example.service.BookService;
+import com.example.service.BorrowService;
 import com.example.service.ReaderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +35,7 @@ public class ReaderController {
     private ReaderService readerService;
 
     @Autowired
-    private BookService bookService;
+    private BorrowService borrowService;
 
     @Operation(summary = "Retrieve all readers", description = "Retrieves all readers")
     @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -100,6 +101,29 @@ public class ReaderController {
             @PathVariable @Parameter(description = "The ID of the reader") long id) {
         readerService.deleteReaderById(id);
         return ResponseEntity.ok("Reader deleted successfully.");
+    }
+
+    @Operation(summary = "Retrieve all borrows by reader id", description = "Retrieves all borrows by reader id where the book is borrowed")
+    @ApiResponse(responseCode = "200", description = "Successful operation",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "[{\"id\": 1, \"bookId\": 1, \"readerId\": 1,"
+                            + "\"borrowStartDate\": \"2023-07-24\", \"borrowEndDate\": null, \"expectedReturn\": \"2023-08-07\"},"
+                            + "{\"id\": 2, \"bookId\": 2, \"readerId\": 1, "
+                            + "\"borrowStartDate\": \"2023-07-20\", \"borrowEndDate\": null, \"expectedReturn\": \"2023-08-07\"}]")))
+    @ApiResponse(responseCode = "204", description = "No Content", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Bad Request",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
+                            + "\"errorMessage\":\"An error occurred: Reader with ID 0 does not exist\"}")))
+    @GetMapping("/{readerId}/borrow")
+    public ResponseEntity<List<Borrow>>  getAllBorrowsByReaderId(@PathVariable long readerId) {
+        List<Borrow> borrows = borrowService.getAllBorrowsByReaderId(readerId);
+
+        if (borrows.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(borrows);
     }
 
 }

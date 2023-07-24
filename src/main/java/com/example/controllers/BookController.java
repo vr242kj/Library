@@ -1,7 +1,9 @@
 package com.example.controllers;
 
 import com.example.entity.Book;
+import com.example.entity.Borrow;
 import com.example.service.BookService;
+import com.example.service.BorrowService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,6 +33,9 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private BorrowService borrowService;
 
     @Operation(summary = "Retrieve all books", description = "Retrieves all books")
     @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -100,6 +105,21 @@ public class BookController {
             @PathVariable @Parameter(description = "The ID of the book") long id) {
         bookService.deleteBookById(id);
         return ResponseEntity.ok("Book deleted successfully.");
+    }
+
+    @Operation(summary = "Get borrow by book ID", description = "Retrieves borrow by book ID if book borrowed")
+    @ApiResponse(responseCode = "200", description = "Successful operation",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "{\"id\": 1, \"bookId\": 1, \"readerId\": 1, "
+                            + "\"borrowStartDate\": \"2023-07-24\", \"borrowEndDate\": null, \"expectedReturn\": \"2023-08-07\"}")))
+    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Bad Request",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\",\"errorMessage\":\"An error occurred: Book with ID 0 does not exist\"}")))
+    @GetMapping("/{bookId}/borrow")
+    public ResponseEntity<Borrow> getBorrowByBookId(@PathVariable long bookId) {
+        Optional<Borrow> borrow = borrowService.getBorrowByBookId(bookId);
+        return borrow.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
 }

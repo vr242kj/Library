@@ -24,10 +24,6 @@ public class Reader {
     private String name;
     private LocalDate birthdate;
 
-    public Reader(String name) {
-        this.name = name;
-    }
-
     public void setId(long id) {
         if (this.id == 0) {
             this.id = id;

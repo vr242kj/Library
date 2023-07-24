@@ -23,19 +23,10 @@ public class Borrow {
     private LocalDate borrowEndDate;
     private LocalDate expectedReturn;
 
-    public Borrow(long bookId, long readerId) {
-        this.bookId = bookId;
-        this.readerId = readerId;
-    }
-
     public void setId(long id) {
         if (this.id == 0) {
             this.id = id;
         }
-    }
-
-    public void setBorrowEndDate(LocalDate borrowEndDate) {
-        this.borrowEndDate = borrowEndDate;
     }
 
 }

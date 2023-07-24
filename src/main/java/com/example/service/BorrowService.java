@@ -45,24 +45,31 @@ public class BorrowService {
         long readerId = borrow.getReaderId();
         long bookId = borrow.getBookId();
 
-        Reader reader = readerDaoJdbcTemplate.findById(readerId)
-                .orElseThrow(() -> new ServiceException("This reader id doesn't exist"));
+        Reader reader = getReaderByIdIfExist(readerId);
+        Book book = getBookByIdIfExist(bookId);
 
-        Book book = bookDaoJdbcTemplate.findById(bookId)
-                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
-
-        checkBorrowRules(reader, book, readerId, bookId);
+        checkBorrowRules(reader, book);
 
         return borrowDaoJdbcTemplate.save(borrow);
     }
 
-    private void checkBorrowRules(Reader reader, Book  book, long readerId, long bookId) {
+    private Reader getReaderByIdIfExist(long readerId) {
+        return readerDaoJdbcTemplate.findById(readerId)
+                .orElseThrow(() -> new ServiceException("This reader id doesn't exist"));
+    }
+
+    private Book getBookByIdIfExist(long bookId) {
+        return bookDaoJdbcTemplate.findById(bookId)
+                .orElseThrow(() -> new ServiceException("This book id doesn't exist"));
+    }
+
+    private void checkBorrowRules(Reader reader, Book  book) {
         List<Borrow> allBorrows = borrowDaoJdbcTemplate.findAll();
 
-        amountBorrowedBookByReaderId(allBorrows, readerId);
-        expiredBorrow(allBorrows, readerId);
+        isBookInLibrary(allBorrows, book.getId());
+        amountBorrowedBookByReaderId(allBorrows, reader.getId());
+        expiredBorrow(allBorrows, reader.getId());
         accessibilityBookForReaderByAge(reader.getBirthdate(), book.isRestricted());
-        isBookInLibrary(allBorrows, bookId);
     }
 
     private void amountBorrowedBookByReaderId(List<Borrow> allBorrows, Long readerId) {
@@ -107,8 +114,24 @@ public class BorrowService {
         }
     }
 
-    public void deleteBorrowById(long id) {
-        borrowDaoJdbcTemplate.deleteById(id);
+    public void updateBorrowAndReturnBook(long borrowId) {
+        borrowDaoJdbcTemplate.findById(borrowId)
+                .orElseThrow(() -> new ServiceException("This borrow id doesn't exist"));
+
+        LocalDate currentDate = LocalDate.now();
+        borrowDaoJdbcTemplate.returnBookToLibraryByBorrowId(borrowId, currentDate);
+    }
+
+    public Optional<Borrow> getBorrowByBookId(long bookId) {
+        getBookByIdIfExist(bookId);
+
+        return borrowDaoJdbcTemplate.findBorrowByBookId(bookId);
+    }
+
+    public List<Borrow> getAllBorrowsByReaderId(long readerId) {
+        getReaderByIdIfExist(readerId);
+
+        return borrowDaoJdbcTemplate.findAllBorrowsByReaderId(readerId);
     }
 
 }

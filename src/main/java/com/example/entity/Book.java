@@ -29,9 +29,10 @@ public class Book {
     int maxBorrowTimeInDay;
     @NotNull
     boolean restricted;
-    public Book(String name, String author) {
+    public Book(String name, String author, boolean restricted) {
         this.name = name;
         this.author = author;
+        this.restricted = restricted;
     }
 
     public void setId(long id) {
