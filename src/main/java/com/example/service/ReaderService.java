@@ -2,17 +2,16 @@ package com.example.service;
 
 import com.example.dao.ReaderDaoJdbcTemplateImpl;
 import com.example.entity.Reader;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ReaderService {
-
-    @Autowired
-    ReaderDaoJdbcTemplateImpl readerDaoJdbcTemplate;
+    private final ReaderDaoJdbcTemplateImpl readerDaoJdbcTemplate;
 
     public List<Reader> findAllReaders() {
         return readerDaoJdbcTemplate.findAll();

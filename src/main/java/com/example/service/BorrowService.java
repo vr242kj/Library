@@ -7,7 +7,7 @@ import com.example.entity.Book;
 import com.example.entity.Borrow;
 import com.example.entity.Reader;
 import com.example.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class BorrowService {
-
-    @Autowired
-    BorrowDaoJdbcTemplateImpl borrowDaoJdbcTemplate;
-
-    @Autowired
-    BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
-
-    @Autowired
-    ReaderDaoJdbcTemplateImpl readerDaoJdbcTemplate;
+    private final BorrowDaoJdbcTemplateImpl borrowDaoJdbcTemplate;
+    private final BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
+    private final ReaderDaoJdbcTemplateImpl readerDaoJdbcTemplate;
 
     @Value("${library.maxBooksForBorrow}")
     private int maxBooksForBorrow;
@@ -56,18 +51,20 @@ public class BorrowService {
 
     private Reader getReaderByIdIfExist(long readerId) {
         return readerDaoJdbcTemplate.findById(readerId)
-                .orElseThrow(() -> new ResourceNotFoundException("This reader id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("This reader id %d doesn't exist", readerId)));
     }
 
     private Book getBookByIdIfExist(long bookId) {
         return bookDaoJdbcTemplate.findById(bookId)
-                .orElseThrow(() -> new ResourceNotFoundException("This book id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("This book id %d doesn't exist", bookId)));
     }
 
     private void checkBorrowRules(Reader reader, Book  book) {
         List<Borrow> allBorrows = borrowDaoJdbcTemplate.findAll();
 
-        isBookInLibrary(allBorrows, book.getId());
+        IsBookAvailableForBorrow(allBorrows, book.getId());
         amountBorrowedBookByReaderId(allBorrows, reader.getId());
         expiredBorrow(allBorrows, reader.getId());
         accessibilityBookForReaderByAge(reader.getBirthdate(), book.isRestricted());
@@ -104,7 +101,7 @@ public class BorrowService {
         }
     }
 
-    private void isBookInLibrary(List<Borrow> allBorrows, Long bookId) {
+    private void IsBookAvailableForBorrow(List<Borrow> allBorrows, Long bookId) {
         Optional<Borrow> isBookInLibrary = allBorrows.stream()
                 .filter(borrow -> borrow.getBookId() == bookId)
                 .filter(borrow -> borrow.getBorrowEndDate() == null)

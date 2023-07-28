@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +25,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/borrows")
 @Tag(name = "Borrow API", description = "Endpoints for managing borrows")
 public class BorrowController {
-
-    @Autowired
-    private BorrowService borrowService;
+    private final BorrowService borrowService;
 
     @Operation(summary = "Retrieve all borrows", description = "Retrieves all borrows")
     @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -103,7 +102,8 @@ public class BorrowController {
                             + "\"errorMessage\":\"An error occurred: This borrow id doesn't exist\"}")))
     @PutMapping("/{id}")
     public ResponseEntity<String> updateBorrowReturnBook(
-            @PathVariable @Parameter(description = "The ID of the borrow ") long id) {
+            @PathVariable @Parameter(description = "The ID of the borrow ") long id,
+            @RequestBody @Parameter(description = "The updated borrow information") Borrow newBorrow) {
         borrowService.updateBorrowAndReturnBook(id);
         return ResponseEntity.ok("Borrow updated successfully, book is in library.");
     }

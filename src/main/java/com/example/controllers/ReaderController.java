@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,15 +27,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/readers")
 @Tag(name = "Reader API", description = "Endpoints for managing readers")
 public class ReaderController {
-
-    @Autowired
-    private ReaderService readerService;
-
-    @Autowired
-    private BorrowService borrowService;
+    private final ReaderService readerService;
+    private final BorrowService borrowService;
 
     @Operation(summary = "Retrieve all readers", description = "Retrieves all readers")
     @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -115,7 +112,7 @@ public class ReaderController {
             content = @Content(mediaType = "application/json",
                     examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
                             + "\"errorMessage\":\"An error occurred: Reader with ID 0 does not exist\"}")))
-    @GetMapping("/{readerId}/borrow")
+    @GetMapping("/{readerId}/borrows")
     public ResponseEntity<List<Borrow>>  getAllBorrowsByReaderId(@PathVariable long readerId) {
         List<Borrow> borrows = borrowService.getAllBorrowsByReaderId(readerId);
 

@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,15 +27,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/books")
 @Tag(name = "Book API", description = "Endpoints for managing books")
 public class BookController {
-
-    @Autowired
-    private BookService bookService;
-
-    @Autowired
-    private BorrowService borrowService;
+    private final BookService bookService;
+    private final BorrowService borrowService;
 
     @Operation(summary = "Retrieve all books", description = "Retrieves all books")
     @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -117,10 +114,11 @@ public class BookController {
             content = @Content(mediaType = "application/json",
                     examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
                             + "\"errorMessage\":\"An error occurred: Book with ID 0 does not exist\"}")))
-    @GetMapping("/{bookId}/borrow")
+    @GetMapping("/{bookId}/borrows")
     public ResponseEntity<Borrow> getBorrowByBookId(@PathVariable long bookId) {
-        Optional<Borrow> borrow = borrowService.getBorrowByBookId(bookId);
-        return borrow.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return borrowService.getBorrowByBookId(bookId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

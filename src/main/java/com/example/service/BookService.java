@@ -2,7 +2,7 @@ package com.example.service;
 
 import com.example.dao.BookDaoJdbcTemplateImpl;
 import com.example.entity.Book;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
-
-    @Autowired
-    BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
+    private final BookDaoJdbcTemplateImpl bookDaoJdbcTemplate;
 
     @Value("${library.defaultMaxBorrowTimeInDays}")
     private int defaultMaxBorrowTimeInDays;
