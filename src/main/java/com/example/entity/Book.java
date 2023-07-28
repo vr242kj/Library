@@ -7,15 +7,16 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
+@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
-    @NotNull
-    private long id;
 
+    private long id;
     @NotBlank(message = "Name is required")
     @Pattern(regexp = "[A-Za-z0-9\\s\\-_,\\.:()]*[A-Za-z0-9\\-_,\\.:()]+",
             message = "The field must not be empty, you can use letters, numbers and -_,.:()")
@@ -25,17 +26,13 @@ public class Book {
     @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*",
             message = "Author must be literal")
     private String author;
-    private long readerId;
-
-    public Book(long id, String name, String author) {
-        this.id = id;
+    int maxBorrowTimeInDay;
+    @NotNull
+    boolean restricted;
+    public Book(String name, String author, boolean restricted) {
         this.name = name;
         this.author = author;
-    }
-
-    public Book(String name, String author) {
-        this.name = name;
-        this.author = author;
+        this.restricted = restricted;
     }
 
     public void setId(long id) {
@@ -44,30 +41,8 @@ public class Book {
         }
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public void setReaderId(long readerId) {
-        this.readerId = readerId;
-    }
-
-    @Override
-    public String toString() {
-        return this.readerId == 0 ? "Book{" +
-                "id = " + id +
-                ", name = '" + name + '\'' +
-                ", author = '" + author + "'}" :
-                "Book{" +
-                        "id = " + id +
-                        ", name = '" + name + '\'' +
-                        ", author = '" + author + '\'' +
-                        ", readerId = " + readerId +
-                        "'}";
+    public void setMaxBorrowTimeInDay(int maxBorrowTimeInDay) {
+        this.maxBorrowTimeInDay = maxBorrowTimeInDay;
     }
 
 }

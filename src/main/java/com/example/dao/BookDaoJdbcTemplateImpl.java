@@ -1,9 +1,8 @@
 package com.example.dao;
 
 import com.example.entity.Book;
-import com.example.entity.Reader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -13,22 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 
+@Slf4j
 @Repository
+@RequiredArgsConstructor
 public class BookDaoJdbcTemplateImpl implements BookDao {
-
-    private static final Logger logger = LoggerFactory.getLogger(BookDaoJdbcTemplateImpl.class);
-
     private final JdbcTemplate jdbcTemplate;
-
-    public BookDaoJdbcTemplateImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public List<Book> findAll() {
@@ -36,7 +27,7 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
             return jdbcTemplate.query("select * from book",
                     this::mapToBook);
         } catch (DataAccessException ex) {
-            logger.error("Failed to retrieval books from the database, due to DB internal error: {}", ex.getLocalizedMessage());
+            log.error("Failed to retrieval books from the database, due to DB internal error: {}", ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve books from the database.", ex);
         }
     }
@@ -48,28 +39,14 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                             this::mapToBook, id)
                     .stream().findFirst();
         } catch (DataAccessException ex) {
-            logger.error("Failed to retrieve book with id {} from the database, due to DB internal error: {}", id, ex.getLocalizedMessage());
+            log.error("Failed to retrieve book with id {} from the database, due to DB internal error: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to retrieve book from the database.", ex);
         }
     }
 
     @Override
-    public List<Book> findAllByReaderId(long readerId) {
-        try {
-            return jdbcTemplate.query(
-                    "select * from book where readerId = ?",
-                    this::mapToBook,
-                    readerId
-            );
-        } catch (DataAccessException ex) {
-            logger.error("Failed to retrieve books by readerId: {}. Error details: {}", readerId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to retrieve books by readerId: " + readerId, ex);
-        }
-    }
-
-    @Override
     public Book save(Book bookToSave) {
-        String SQL_INSERT = "insert into book(name, author) values(?, ?)";
+        String SQL_INSERT = "insert into book(name, author, maxborrowtimeindays, restricted) values(?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -78,10 +55,12 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                 var ps = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, bookToSave.getName());
                 ps.setString(2, bookToSave.getAuthor());
+                ps.setInt(3, bookToSave.getMaxBorrowTimeInDay());
+                ps.setBoolean(4, bookToSave.isRestricted());
                 return ps;
             }, keyHolder);
         } catch (DataAccessException ex) {
-            logger.error("Failed to create new book {} in DB, due to DB internal error: {}", bookToSave, ex.getLocalizedMessage());
+            log.error("Failed to create new book {} in DB, due to DB internal error: {}", bookToSave, ex.getLocalizedMessage());
             throw new DAOException("Failed to save new book: " + bookToSave.toString(), ex);
         }
 
@@ -91,66 +70,12 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                 .ifPresentOrElse(
                         bookToSave::setId,
                         () -> {
-                            logger.error("Generated ID is null for book: {}", bookToSave);
-                            throw new DAOException("Failed to retrieve generated ID for book: " + bookToSave.toString());
+                            log.error("Generated ID is null for book: {}", bookToSave);
+                            throw new DAOException("Failed to retrieve generated ID for book: " + bookToSave);
                         }
                 );
 
         return bookToSave;
-    }
-
-    @Override
-    public void borrowBookToReader(long bookId, long readerId) {
-        try {
-            jdbcTemplate.update("update book set readerId = ? where id = ?",
-                    readerId,
-                    bookId);
-        } catch (DataAccessException ex) {
-            logger.error("Failed to update the book with id {} to reader with id {}, due to DB internal error: {}", bookId, readerId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to update the book with id " + bookId + " to reader with id " + readerId, ex);
-        }
-    }
-
-    @Override
-    public void returnBookToLibrary(long bookId) {
-        try {
-            jdbcTemplate.update("update book set readerId = null where id = ?",
-                    bookId);
-        } catch (DataAccessException ex) {
-            logger.error("Failed to return the book with id {} to the library, due to DB internal error: {}", bookId, ex.getLocalizedMessage());
-            throw new DAOException("Failed to return the book with ID " + bookId + " to the library", ex);
-        }
-    }
-
-    @Override
-    public Map<Book, Optional<Reader>> findAllWithReaders() {
-        String SQL_FIND_ALL_WITH_READERS = """
-                select
-                    book.id,
-                    book.name,
-                    book.author,
-                    book.readerId,
-                    reader.name as readerName
-                from book
-                    left join reader on book.readerId = reader.id
-                """;
-        Map<Book, Optional<Reader>> booksWithReaders = new TreeMap<>(Comparator.comparing(Book::getId));
-
-        try {
-            jdbcTemplate.query(SQL_FIND_ALL_WITH_READERS, (rs, rowNum) -> {
-                var book = mapToBook(rs, rowNum);
-                var readerName = rs.getString("readerName");
-                var reader = Optional.ofNullable(readerName).map(Reader::new);
-
-                booksWithReaders.put(book, reader);
-                return book;
-            });
-        } catch (DataAccessException ex) {
-            logger.error("Failed to retrieve books with readers, due to DB internal error: {}", ex.getLocalizedMessage());
-            throw new DAOException("Failed to retrieve books with readers", ex);
-        }
-
-        return booksWithReaders;
     }
 
     @Override
@@ -162,7 +87,7 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                 throw new DAOException("Book with ID " + id + " does not exist");
             }
         } catch (DataAccessException ex) {
-            logger.error("Failed to delete book with ID {}. Error details: {}", id, ex.getLocalizedMessage());
+            log.error("Failed to delete book with ID {}. Error details: {}", id, ex.getLocalizedMessage());
             throw new DAOException("Failed to delete book with ID " + id, ex);
         }
     }
@@ -173,7 +98,8 @@ public class BookDaoJdbcTemplateImpl implements BookDao {
                     rs.getInt("id"),
                     rs.getString("name"),
                     rs.getString("author"),
-                    rs.getInt("readerId")
+                    rs.getInt("maxborrowtimeindays"),
+                    rs.getBoolean("restricted")
             );
         } catch (SQLException e) {
             throw new DAOException("Failed map resultSet to Book object!" + "\nError details: " + e.getMessage());

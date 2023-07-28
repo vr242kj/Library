@@ -1,8 +1,8 @@
 package com.example.controllers;
 
-import com.example.entity.Book;
+import com.example.entity.Borrow;
 import com.example.entity.Reader;
-import com.example.service.BookService;
+import com.example.service.BorrowService;
 import com.example.service.ReaderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,15 +27,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/readers")
 @Tag(name = "Reader API", description = "Endpoints for managing readers")
 public class ReaderController {
-
-    @Autowired
-    private ReaderService readerService;
-
-    @Autowired
-    private BookService bookService;
+    private final ReaderService readerService;
+    private final BorrowService borrowService;
 
     @Operation(summary = "Retrieve all readers", description = "Retrieves all readers")
     @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -88,24 +85,6 @@ public class ReaderController {
         return reader.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Get books by reader ID", description = "Retrieves books associated with a reader by its ID")
-    @ApiResponse(responseCode = "200", description = "Successful operation",
-            content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = "{\"id\":1,\"name\":\"Book 1\","
-                    + "\"author\":\"Author 1\", \"id\":1}")))
-    @ApiResponse(responseCode = "204", description = "No Content", content = @Content)
-    @GetMapping("/{readerId}/books")
-    public ResponseEntity<List<Book>> getBooksByReaderId(
-            @PathVariable @Parameter(description = "The ID of the reader") long readerId) {
-        List<Book> books = bookService.getBooksByReaderId(readerId);
-
-        if (books.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(books);
-    }
-
     @Operation(summary = "Delete a reader by ID", description = "Deletes a reader by its ID")
     @ApiResponse(responseCode = "200", description = "Successful operation",
             content = @Content(mediaType = "text/plain",
@@ -119,6 +98,29 @@ public class ReaderController {
             @PathVariable @Parameter(description = "The ID of the reader") long id) {
         readerService.deleteReaderById(id);
         return ResponseEntity.ok("Reader deleted successfully.");
+    }
+
+    @Operation(summary = "Retrieve all borrows by reader id", description = "Retrieves all borrows by reader id where the book is borrowed")
+    @ApiResponse(responseCode = "200", description = "Successful operation",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "[{\"id\": 1, \"bookId\": 1, \"readerId\": 1,"
+                            + "\"borrowStartDate\": \"2023-07-24\", \"borrowEndDate\": null, \"expectedReturn\": \"2023-08-07\"},"
+                            + "{\"id\": 2, \"bookId\": 2, \"readerId\": 1, "
+                            + "\"borrowStartDate\": \"2023-07-20\", \"borrowEndDate\": null, \"expectedReturn\": \"2023-08-07\"}]")))
+    @ApiResponse(responseCode = "204", description = "No Content", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Bad Request",
+            content = @Content(mediaType = "application/json",
+                    examples = @ExampleObject(value = "{\"dateTime\":\"2023-07-09T23:14:00.0304944\","
+                            + "\"errorMessage\":\"An error occurred: Reader with ID 0 does not exist\"}")))
+    @GetMapping("/{readerId}/borrows")
+    public ResponseEntity<List<Borrow>>  getAllBorrowsByReaderId(@PathVariable long readerId) {
+        List<Borrow> borrows = borrowService.getAllBorrowsByReaderId(readerId);
+
+        if (borrows.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(borrows);
     }
 
 }
