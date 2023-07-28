@@ -64,7 +64,7 @@ public class BorrowService {
     private void checkBorrowRules(Reader reader, Book  book) {
         List<Borrow> allBorrows = borrowDaoJdbcTemplate.findAll();
 
-        IsBookAvailableForBorrow(allBorrows, book.getId());
+        isBookAvailableForBorrow(allBorrows, book.getId());
         amountBorrowedBookByReaderId(allBorrows, reader.getId());
         expiredBorrow(allBorrows, reader.getId());
         accessibilityBookForReaderByAge(reader.getBirthdate(), book.isRestricted());
@@ -101,7 +101,7 @@ public class BorrowService {
         }
     }
 
-    private void IsBookAvailableForBorrow(List<Borrow> allBorrows, Long bookId) {
+    private void isBookAvailableForBorrow(List<Borrow> allBorrows, Long bookId) {
         Optional<Borrow> isBookInLibrary = allBorrows.stream()
                 .filter(borrow -> borrow.getBookId() == bookId)
                 .filter(borrow -> borrow.getBorrowEndDate() == null)
