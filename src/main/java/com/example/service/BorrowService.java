@@ -114,7 +114,8 @@ public class BorrowService {
 
     public void updateBorrowAndReturnBook(long borrowId) {
         borrowDaoJdbcTemplate.findById(borrowId)
-                .orElseThrow(() -> new ServiceException("This borrow id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("This borrow id %d doesn't exist", borrowId)));
 
         LocalDate currentDate = LocalDate.now();
         borrowDaoJdbcTemplate.returnBookToLibraryByBorrowId(borrowId, currentDate);

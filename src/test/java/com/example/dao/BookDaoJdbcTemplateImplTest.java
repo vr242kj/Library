@@ -31,13 +31,13 @@ class BookDaoJdbcTemplateImplTest {
 
     @ParameterizedTest(name = "{index} ==> {2}")
     @DisplayName("Should throw DaoException when book name or/and author is null")
-    @CsvSource(value = {",,name is null author is null",
-            "name,, author is null",
-            ",author, name is null"})
-    void saveWithWrongParamsInBook(String name, String author, String description) {
+    @CsvSource(value = {",,false, name is null author is null",
+            "name,,false, author is null",
+            ",author,false, name is null"})
+    void saveWithWrongParamsInBook(String name, String author,Boolean restricted, String description) {
         DAOException thrown = assertThrows(
                 DAOException.class,
-                () -> bookDaoJdbcImpl.save(new Book(name, author)),
+                () -> bookDaoJdbcImpl.save(new Book(name, author, restricted)),
                 "Expected DAOException to throw, but it didn't"
         );
 
@@ -49,7 +49,8 @@ class BookDaoJdbcTemplateImplTest {
     void saveBookAndCheckAppearsInDB() {
         var bookName = "Name";
         var bookAuthor = "Author";
-        var bookToSave = new Book(bookName, bookAuthor);
+        var restricted = false;
+        var bookToSave = new Book(bookName, bookAuthor, restricted);
 
         Optional<Book> existingInDb = bookDaoJdbcImpl.findAll().stream()
                 .filter(book -> bookAuthor.equals(book.getAuthor()) && bookName.equals(book.getName()))

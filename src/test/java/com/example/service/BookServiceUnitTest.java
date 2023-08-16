@@ -27,8 +27,8 @@ class BookServiceUnitTest {
     @DisplayName("Should successfully retrieve all books")
     void findAllBooks() {
         List<Book> actualBooks = List.of(
-                new Book(1, "XXX", "XXX"),
-                new Book(2, "YYY", "YYY")
+                new Book(1, "XXX", "XXX", 10, false),
+                new Book(2, "YYY", "YYY", 10, false)
         );
 
         when(bookDaoJdbcTemplate.findAll()).thenReturn(actualBooks);

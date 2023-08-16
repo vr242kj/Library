@@ -2,8 +2,7 @@ package com.example.controllers;
 
 import com.example.entity.Book;
 import com.example.service.BookService;
-import com.example.service.ReaderService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.service.BorrowService;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,10 +22,7 @@ class BookControllerTest {
     private BookService bookService;
 
     @MockBean
-    private ReaderService readerService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private BorrowService borrowService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,16 +33,15 @@ class BookControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"' ', ' '",
-                        "name, 111",
-                        " , author",
-                        "name, ",
-                        " , "})
+    @CsvSource(value = {"' ', ' ', false",
+                        "name, 111, false",
+                        " , author, false",
+                        "name, , false"})
     @DisplayName("Should return bad request when parameter book not valid")
-    void saveBook_WhenParamBookNotValid_ThenReturnBadRequest(String name, String author) {
+    void saveBook_WhenParamBookNotValid_ThenReturnBadRequest(String name, String author, Boolean restricted) {
         given()
           .contentType("application/json")
-          .body(new Book(name, author))
+          .body(new Book(name, author, restricted))
         .when()
           .post("/api/v1/books")
         .then()

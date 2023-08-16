@@ -38,12 +38,12 @@ class BookControllerFullContextTest {
     @Test
     @DisplayName("Should successfully save new book")
     void saveBook() throws Exception {
-        Book expectedBook = new Book(6, "Don Quixote", "Miguel de Cervantes");
+        Book expectedBook = new Book(6, "Don Quixote", "Miguel de Cervantes",14,  false);
 
         ExtractableResponse<Response> response =
                     given()
                         .contentType("application/json")
-                        .body(new Book("Don Quixote", "Miguel de Cervantes"))
+                        .body(new Book("Don Quixote", "Miguel de Cervantes", false))
                     .when()
                         .post()
                     .then()
@@ -58,6 +58,7 @@ class BookControllerFullContextTest {
                     .body("id", notNullValue())
                     .body("name", equalTo(expectedBook.getName()))
                     .body("author", equalTo(expectedBook.getAuthor()))
+                    .body("restricted", equalTo(expectedBook.isRestricted()))
                     .extract()
                     .path("id");
 
@@ -71,7 +72,9 @@ class BookControllerFullContextTest {
                         (resultSet, rowNum) -> new Book(
                                 resultSet.getInt("id"),
                                 resultSet.getString("name"),
-                                resultSet.getString("author")
+                                resultSet.getString("author"),
+                                resultSet.getInt("maxborrowtimeindays"),
+                                resultSet.getBoolean("restricted")
                         ), userId)
                 .stream().findFirst().orElseThrow(() -> new Exception("This book id doesn't exist"));
     }

@@ -24,6 +24,11 @@ public class Reader {
     private String name;
     private LocalDate birthdate;
 
+    public Reader(String name, LocalDate birthdate) {
+        this.name = name;
+        this.birthdate = birthdate;
+    }
+
     public void setId(long id) {
         if (this.id == 0) {
             this.id = id;
