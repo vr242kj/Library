@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -34,10 +35,12 @@ class BorrowControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, 99999", "99999, 1"})
-    void saveBorrow_WhenBookOrReaderIdNotExist_ThenReturnNotFound(long bookId, long readerId) {
+    @CsvSource(value = {"1, 99999, reader", "99999, 1, book"})
+    void saveBorrow_WhenBookOrReaderIdNotExist_ThenReturnNotFound(long bookId, long readerId, String entityName) {
         Borrow testBorrow = new Borrow(bookId, readerId);
-        when(borrowService.addNewBorrow(testBorrow)).thenThrow(ResourceNotFoundException.class);
+
+        when(borrowService.addNewBorrow(testBorrow))
+                .thenThrow(new ResourceNotFoundException("This " + entityName  + " id 99999 doesn't exist"));
 
         given()
                 .contentType("application/json")
@@ -45,13 +48,15 @@ class BorrowControllerTest {
                 .when()
                 .post("/api/v1/borrows")
                 .then()
-                .statusCode(404);
+                .statusCode(404)
+                .body("errorMessage",
+                        equalTo("An error occurred: This " + entityName + " id 99999 doesn't exist"));
     }
 
     @Test
     void saveBorrow_WhenCheckBorrowRulesFails_ThenReturnBadRequest() {
         Borrow testBorrow = new Borrow(1, 1);
-        when(borrowService.addNewBorrow(testBorrow)).thenThrow(ServiceException.class);
+        when(borrowService.addNewBorrow(testBorrow)).thenThrow(new ServiceException("Rejected! Book isn't available"));
 
         given()
                 .contentType("application/json")
@@ -59,7 +64,8 @@ class BorrowControllerTest {
                 .when()
                 .post("/api/v1/borrows")
                 .then()
-                .statusCode(400);
+                .statusCode(400)
+                .body("errorMessage", equalTo("An error occurred: Rejected! Book isn't available"));
     }
 
     @Test
@@ -75,7 +81,8 @@ class BorrowControllerTest {
                 .when()
                 .put("/api/v1/borrows/{id}", nonExistentBorrowId)
                 .then()
-                .statusCode(404);
+                .statusCode(404)
+                .body("errorMessage", equalTo("An error occurred: This borrow id doesn't exist"));
     }
 
     @Test
@@ -88,7 +95,8 @@ class BorrowControllerTest {
                 .when()
                 .put("/api/v1/borrows/{id}", borrowId)
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .body(equalTo("Borrow updated successfully, book is in library."));
     }
 
     @Test

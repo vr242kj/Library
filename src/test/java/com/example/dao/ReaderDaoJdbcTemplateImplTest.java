@@ -1,8 +1,6 @@
 package com.example.dao;
 
 import com.example.entity.Reader;
-import com.example.exception.ResourceNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +9,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -25,14 +28,22 @@ class ReaderDaoJdbcTemplateImplTest {
 
     @Test
     void findById_WhenNewReaderSaved_AssertSavedReaderFromDbNotNull() {
-        Reader reader = new Reader(1, "name", LocalDate.parse("1999-01-10"));
+        Reader mockReader = new Reader( "name", LocalDate.parse("1999-01-10"));
 
-        readerDaoJdbcTemplate.save(reader);
+        var generatedId = readerDaoJdbcTemplate.save(mockReader).getId();
 
-        Reader readerDB = readerDaoJdbcTemplate.findById(reader.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("This reader id %d doesn't exist", reader.getId())));
+        Optional<Reader> readerDB = readerDaoJdbcTemplate.findById(generatedId);
 
-        Assertions.assertNotNull(readerDB);
+        // Assert
+        assertAll("Saved reader information",
+                () -> assertTrue(readerDB.isPresent(), "Reader should be present"),
+                () -> assertEquals(generatedId, readerDB.map(Reader::getId)
+                        .orElse(null), "IDs should match"),
+                () -> assertEquals(mockReader.getName(), readerDB.map(Reader::getName)
+                        .orElse(null), "Names should match"),
+                () -> assertEquals(mockReader.getBirthdate(), readerDB.map(Reader::getBirthdate)
+                        .orElse(null), "Birthdates should match")
+        );
     }
 
 }

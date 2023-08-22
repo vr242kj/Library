@@ -38,7 +38,8 @@ class BookControllerFullContextTest {
     @Test
     @DisplayName("Should successfully save new book")
     void saveBook() throws Exception {
-        Book expectedBook = new Book(6, "Don Quixote", "Miguel de Cervantes",14,  false);
+        Book expectedBook = new Book(6, "Don Quixote",
+                "Miguel de Cervantes",14,  false);
 
         ExtractableResponse<Response> response =
                     given()

@@ -25,11 +25,16 @@ public class BookServiceIntegrationTest {
 
     @BeforeEach
     public void setUp() {
-        expectedBooks.add(new Book(1,"In Search of Lost Time", "Marcel Proust", 5, true));
-        expectedBooks.add(new Book(2, "Ulysses", "James Joyce", 10, true));
-        expectedBooks.add(new Book(3, "Don Quixote", "Miguel de Cervantes", 14, false));
-        expectedBooks.add(new Book(4, "Moby Dick", "Herman Melville", 5, false));
-        expectedBooks.add(new Book(5, "Hamlet", "William Shakespeare", 10 ,true));
+        expectedBooks.add(new Book(1, "In Search of Lost Time", "Marcel Proust",
+                5, true));
+        expectedBooks.add(new Book(2, "Ulysses", "James Joyce",
+                10, true));
+        expectedBooks.add(new Book(3, "Don Quixote", "Miguel de Cervantes",
+                14, false));
+        expectedBooks.add(new Book(4, "Moby Dick", "Herman Melville",
+                5, false));
+        expectedBooks.add(new Book(5, "Hamlet", "William Shakespeare",
+                10, true));
     }
 
     @Test

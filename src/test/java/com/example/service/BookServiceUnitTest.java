@@ -1,5 +1,6 @@
 package com.example.service;
 
+//import com.example.TestUtils;
 import com.example.dao.BookDaoJdbcTemplateImpl;
 import com.example.entity.Book;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,7 @@ class BookServiceUnitTest {
                 new Book(1, "XXX", "XXX", 10, false),
                 new Book(2, "YYY", "YYY", 10, false)
         );
+       //List<Book> actualBooks = TestUtils.generateListOfBook();
 
         when(bookDaoJdbcTemplate.findAll()).thenReturn(actualBooks);
 

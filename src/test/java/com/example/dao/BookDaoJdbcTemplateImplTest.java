@@ -71,4 +71,5 @@ class BookDaoJdbcTemplateImplTest {
 
         bookDaoJdbcImpl.deleteById(generatedId);
     }
+
 }
