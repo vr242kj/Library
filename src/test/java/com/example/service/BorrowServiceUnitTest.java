@@ -1,5 +1,7 @@
 package com.example.service;
 
+//import com.example.TestUtils;
+
 import com.example.dao.BookDaoJdbcTemplateImpl;
 import com.example.dao.BorrowDaoJdbcTemplateImpl;
 import com.example.dao.ReaderDaoJdbcTemplateImpl;
@@ -13,16 +15,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,20 +40,24 @@ class BorrowServiceUnitTest {
 
     @Mock
     private ReaderDaoJdbcTemplateImpl readerDaoJdbcTemplate;
+    //private TestUtils testUtils;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(borrowService, "maxBooksForBorrow", 4);
-        ReflectionTestUtils.setField(borrowService, "minAgeForRestrictedBooks", 18);
+        borrowService.setMaxBooksForBorrow(2);
+        borrowService.setMinAgeForRestrictedBooks(18);
+        //testUtils = new TestUtils();
     }
 
     @Test
     void findAllBorrows_WhenBorrowsExist_ReturnListOfBorrows() {
+        //List<Borrow> actualBorrows = testUtils.generateListOfBorrow();
         List<Borrow> actualBorrows = List.of(
-                new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18")),
-                new Borrow(2, 2, 2, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"))
+                new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"),
+                        LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18")),
+                new Borrow(2, 2, 1, LocalDate.parse("2020-01-08"),
+                        LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"))
         );
-
         when(borrowDaoJdbcTemplate.findAll()).thenReturn(actualBorrows);
 
         List<Borrow> expectedBorrows = borrowService.findAllBorrows();
@@ -62,8 +67,9 @@ class BorrowServiceUnitTest {
 
     @Test
     void findByBorrowId_WhenBorrowExists_ReturnBorrow() {
-        Borrow borrow =  new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"));
-
+        //Borrow borrow = testUtils.generateBorrow();
+        Borrow borrow = new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"),
+                LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"));
         when(borrowDaoJdbcTemplate.findById(borrow.getId())).thenReturn(Optional.of(borrow));
 
         Optional<Borrow> expectedBorrow = borrowService.findByBorrowId(borrow.getId());
@@ -73,9 +79,13 @@ class BorrowServiceUnitTest {
 
     @Test
     void getBorrowByBookId_WhenBorrowExistsForBook_ReturnBorrow() {
-        Borrow borrow =  new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"));
+        //Borrow borrow = testUtils.generateBorrow();
+        Borrow borrow = new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"),
+                LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"));
 
-        when(bookDaoJdbcTemplate.findById(borrow.getBookId())).thenReturn(Optional.of(new Book(1, "name", "author", 10, false)));
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenReturn(Optional.of(new Book(1, "name",
+                        "author", 10, false)));
 
         when(borrowDaoJdbcTemplate.findBorrowByBookId(borrow.getBookId())).thenReturn(Optional.of(borrow));
 
@@ -84,82 +94,100 @@ class BorrowServiceUnitTest {
         assertEquals(borrow, expectedBorrow.get());
     }
 
-
     @Test
     void getAllBorrowsByReaderId_WhenBorrowsExistForReader_ReturnListOfBorrows() {
-        Borrow borrow = new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-10"), LocalDate.parse("2020-01-18"));
+        //Borrow borrow1 = testUtils.generateListOfBorrow().get(0);
+        //Borrow borrow2 = testUtils.generateListOfBorrow().get(1);
+        Borrow borrow1 = new Borrow(1, 1, 1,
+                LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18"));
+        Borrow borrow2 = new Borrow(2, 2, 1,
+                LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18"));
 
-        when(readerDaoJdbcTemplate.findById(borrow.getReaderId())).thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
+        when(readerDaoJdbcTemplate.findById(borrow1.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
 
-        when(borrowDaoJdbcTemplate.findAllBorrowsByReaderId(borrow.getReaderId())).thenReturn(List.of(borrow));
+        when(borrowDaoJdbcTemplate.findAllBorrowsByReaderId(borrow1.getReaderId()))
+                .thenReturn(List.of(borrow1, borrow2));
 
-        List<Borrow> expectedBorrow = borrowService.getAllBorrowsByReaderId(borrow.getId());
+        List<Borrow> expectedBorrows = borrowService.getAllBorrowsByReaderId(borrow1.getReaderId());
 
-        assertEquals(borrow, expectedBorrow.get(0));
+        assertEquals(2, expectedBorrows.size());
+        assertEquals(borrow1, expectedBorrows.get(0));
+        assertEquals(borrow2, expectedBorrows.get(1));
     }
 
     @Test
     void addNewBorrow_WhenReaderNotFound_ThrowResourceNotFoundException() {
         Borrow borrow = new Borrow(1, 99999);
+        String errorMessage = String.format("This reader id %d doesn't exist", borrow.getReaderId());
 
-        when(readerDaoJdbcTemplate.findById(borrow.getReaderId())).thenThrow(ResourceNotFoundException.class);
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenThrow(new ResourceNotFoundException(errorMessage));
 
-        assertThrows(ResourceNotFoundException.class, () -> borrowService.addNewBorrow(borrow));
+        Throwable thrown = assertThrows(ResourceNotFoundException.class, () -> borrowService.addNewBorrow(borrow));
+        assertEquals(errorMessage, thrown.getMessage());
     }
 
     @Test
     void addNewBorrow_WhenBookNotFound_ThrowResourceNotFoundException() {
         Borrow borrow = new Borrow(99999, 1);
+        String errorMessage = String.format("This book id %d doesn't exist", borrow.getBookId());
 
-        lenient().when(bookDaoJdbcTemplate.findById(borrow.getBookId())).thenThrow(ResourceNotFoundException.class);
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
 
-        assertThrows(ResourceNotFoundException.class, () -> borrowService.addNewBorrow(borrow));
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenThrow(new ResourceNotFoundException(errorMessage));
+
+        Throwable thrown = assertThrows(ResourceNotFoundException.class, () -> borrowService.addNewBorrow(borrow));
+        assertEquals(errorMessage, thrown.getMessage());
     }
 
     @Test
     void addNewBorrow_WhenBookNotAvailableForBorrow_ThrowServiceException() {
         Borrow borrow = new Borrow(1, 1);
 
+        //List<Borrow> actualBorrows = testUtils.generateListOfBorrow();
         List<Borrow> actualBorrows = List.of(
-                new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18")),
-                new Borrow(2, 2, 2, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18"))
+                new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"),
+                        LocalDate.parse("2020-01-10"))
         );
 
-        when(readerDaoJdbcTemplate.findById(borrow.getReaderId())).thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
-        when(bookDaoJdbcTemplate.findById(borrow.getBookId())).thenReturn(Optional.of(new Book(1, "name", "author", 10, false)));
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
+
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenReturn(Optional.of(new Book(1, "name",
+                        "author", 10, false)));
 
         when(borrowDaoJdbcTemplate.findAll()).thenReturn(actualBorrows);
 
-        Exception exception = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
-
-        String expectedMessage = "Rejected! Book isn't available";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
+        Throwable thrown = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
+        assertEquals("Rejected! Book isn't available", thrown.getMessage());
     }
 
     @Test
     void addNewBorrow_WhenReaderReachedBorrowLimit_ThrowServiceException() {
-        Borrow borrow = new Borrow(6, 1);
+        Borrow borrow = new Borrow(3, 1);
 
+        //List<Borrow> actualBorrows = testUtils.generateListOfBorrow();
         List<Borrow> actualBorrows = List.of(
-                new Borrow(1, 1, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18")),
-                new Borrow(2, 2, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18")),
-                new Borrow(3, 3, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18")),
-                new Borrow(4, 4, 1, LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18"))
+                new Borrow(1, 1, 1,
+                        LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18")),
+                new Borrow(2, 2, 1,
+                        LocalDate.parse("2020-01-08"), LocalDate.parse("2020-01-18"))
         );
 
-        when(readerDaoJdbcTemplate.findById(borrow.getReaderId())).thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
-        when(bookDaoJdbcTemplate.findById(borrow.getBookId())).thenReturn(Optional.of(new Book(6, "name", "author", 10, false)));
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
+
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenReturn(Optional.of(new Book(3, "name", "author", 10, false)));
 
         when(borrowDaoJdbcTemplate.findAll()).thenReturn(actualBorrows);
 
-        Exception exception = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
-
-        String expectedMessage = "The reader has reached the limit of borrowed books";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
+        Throwable thrown = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
+        assertEquals("The reader has reached the limit of borrowed books", thrown.getMessage());
     }
 
     @Test
@@ -167,35 +195,58 @@ class BorrowServiceUnitTest {
         Borrow borrow = new Borrow(2, 1);
 
         List<Borrow> actualBorrows = List.of(
-                new Borrow(1, 1, 1, LocalDate.now().minusDays(2), LocalDate.now().minusDays(1))
-                );
+                new Borrow(1, 1, 1,
+                        LocalDate.now().minusDays(2), LocalDate.now().minusDays(1))
+        );
 
-        when(readerDaoJdbcTemplate.findById(borrow.getReaderId())).thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
-        when(bookDaoJdbcTemplate.findById(borrow.getBookId())).thenReturn(Optional.of(new Book(2, "name", "author", 10, false)));
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenReturn(Optional.of(new Book(2, "name",
+                        "author", 10, false)));
 
         when(borrowDaoJdbcTemplate.findAll()).thenReturn(actualBorrows);
 
-        Exception exception = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
+        Throwable thrown = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
+        assertEquals("The reader exceeded the maximum borrowed time for the book.", thrown.getMessage());
 
-        String expectedMessage = "The reader exceeded the maximum borrowed time for the book.";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
     void addNewBorrow_WhenReaderNotOldEnoughForRestrictedBook_ThrowServiceException() {
         Borrow borrow = new Borrow(1, 1);
 
-        when(readerDaoJdbcTemplate.findById(borrow.getReaderId())).thenReturn(Optional.of(new Reader(1, "name", LocalDate.now().minusYears(15))));
-        when(bookDaoJdbcTemplate.findById(borrow.getBookId())).thenReturn(Optional.of(new Book(1, "name", "author", 10, true)));
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name",
+                        LocalDate.now().minusYears(15))));
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenReturn(Optional.of(new Book(1, "name",
+                        "author", 10, true)));
 
-        Exception exception = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
+        Throwable thrown = assertThrows(ServiceException.class, () -> borrowService.addNewBorrow(borrow));
+        assertEquals("Rejected! Reader isn't old enough to borrow the restricted book", thrown.getMessage());
+    }
 
-        String expectedMessage = "Rejected! Reader isn't old enough to borrow the restricted book";
-        String actualMessage = exception.getMessage();
+    @Test
+    void addNewBorrow_WhenBorrowParamsIsValid_ThanShouldReturnBorrow() {
+        Borrow borrow = new Borrow(1, 1);
 
-        assertTrue(actualMessage.contains(expectedMessage));
+        when(bookDaoJdbcTemplate.findById(borrow.getBookId()))
+                .thenReturn(Optional.of(new Book(1, "name",
+                        "author", 10, false)));
+
+        when(readerDaoJdbcTemplate.findById(borrow.getReaderId()))
+                .thenReturn(Optional.of(new Reader(1, "name", LocalDate.parse("1999-01-10"))));
+
+        when(borrowDaoJdbcTemplate.save(borrow)).thenReturn(borrow);
+
+        var savedBorrow = borrowService.addNewBorrow(borrow);
+
+        assertAll(
+                () -> assertNotNull(savedBorrow),
+                () -> assertEquals(borrow.getBookId(), savedBorrow.getBookId()),
+                () -> assertEquals(borrow.getReaderId(), savedBorrow.getReaderId())
+        );
     }
 
 }

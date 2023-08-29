@@ -45,8 +45,6 @@ public class ReaderDaoJdbcTemplateImpl implements ReaderDao {
         }
     }
 
-
-
     @Override
     public Reader save(Reader readerToSave) {
         String SQL_INSERT = "insert into reader(name, birthdate) values(?, ?)";

@@ -18,16 +18,16 @@ public class Book {
 
     private long id;
     @NotBlank(message = "Name is required")
-    @Pattern(regexp = "[A-Za-z0-9\\s\\-_,\\.:()]*[A-Za-z0-9\\-_,\\.:()]+",
-            message = "The field must not be empty, you can use letters, numbers and -_,.:()")
+    @Pattern(regexp = "[A-Za-z0-9\\s\\-_,\\.:()]*[A-Za-z0-9\\-_,\\.:()]*",
+            message = "Use letters, numbers and -_,.:()!")
     private String name;
 
     @NotBlank(message = "Author is required")
-    @Pattern(regexp = "[a-zA-Z]+\\s?[a-zA-Z]+\\s?[a-zA-Z]*\\s*",
+    @Pattern(regexp = "[a-zA-Z]*\\s?[a-zA-Z]*\\s?[a-zA-Z]*\\s*",
             message = "Author must be literal")
     private String author;
     int maxBorrowTimeInDay;
-    @NotNull
+    @NotNull(message = "Restricted value is required")
     boolean restricted;
     public Book(String name, String author, boolean restricted) {
         this.name = name;

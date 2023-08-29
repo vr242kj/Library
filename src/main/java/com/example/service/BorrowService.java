@@ -29,6 +29,14 @@ public class BorrowService {
     @Value("${library.minAgeForRestrictedBooks}")
     private int minAgeForRestrictedBooks;
 
+    public void setMaxBooksForBorrow(int maxBooksForBorrow) {
+        this.maxBooksForBorrow = maxBooksForBorrow;
+    }
+
+    public void setMinAgeForRestrictedBooks(int minAgeForRestrictedBooks) {
+        this.minAgeForRestrictedBooks = minAgeForRestrictedBooks;
+    }
+
     public List<Borrow> findAllBorrows() {
         return borrowDaoJdbcTemplate.findAll();
     }
