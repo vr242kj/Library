@@ -1,0 +1,46 @@
+version: '3'
+services:
+  library-app:
+    image: xnenonx/library-app:latest
+    container_name: library-app
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/library
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Olimp123
+      MIN_AGE_FOR_RESTRICTED_BOOK: 18
+      MAX_BOOKS_FOR_BORROW: 4
+      DEFAULT_MAX_BORROW_TIME_IN_DAYS: 14
+      JAVA_TOOL_OPTIONS: "-Dspring.profiles.active=dev"
+    depends_on:
+      - postgres
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - library-network
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: library
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Olimp123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - library-network
+
+networks:
+  library-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+
