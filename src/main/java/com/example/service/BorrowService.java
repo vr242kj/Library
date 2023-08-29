@@ -29,6 +29,14 @@ public class BorrowService {
     @Value("${library.minAgeForRestrictedBooks}")
     private int minAgeForRestrictedBooks;
 
+    public void setMaxBooksForBorrow(int maxBooksForBorrow) {
+        this.maxBooksForBorrow = maxBooksForBorrow;
+    }
+
+    public void setMinAgeForRestrictedBooks(int minAgeForRestrictedBooks) {
+        this.minAgeForRestrictedBooks = minAgeForRestrictedBooks;
+    }
+
     public List<Borrow> findAllBorrows() {
         return borrowDaoJdbcTemplate.findAll();
     }
@@ -114,7 +122,8 @@ public class BorrowService {
 
     public void updateBorrowAndReturnBook(long borrowId) {
         borrowDaoJdbcTemplate.findById(borrowId)
-                .orElseThrow(() -> new ServiceException("This borrow id doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("This borrow id %d doesn't exist", borrowId)));
 
         LocalDate currentDate = LocalDate.now();
         borrowDaoJdbcTemplate.returnBookToLibraryByBorrowId(borrowId, currentDate);
