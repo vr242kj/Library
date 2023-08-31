@@ -18,6 +18,7 @@
 http://localhost:8081/book-library/actuator
 http://localhost:8081/book-library/actuator/info
 http://localhost:8081/book-library/actuator/health
+http://localhost:8081/book-library/monitoring
 ```
 > Environment variables
 - DEFAULT_MAX_BORROW_TIME_IN_DAYS: 14
