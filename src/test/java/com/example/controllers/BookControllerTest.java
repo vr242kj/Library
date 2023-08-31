@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 
 @WebMvcTest(BookController.class)
 class BookControllerTest {
@@ -60,8 +61,7 @@ class BookControllerTest {
                 .post("/api/v1/books")
                 .then()
                 .statusCode(400)
-                .body("errors[0].constraint", equalTo("Author is required"))
-                .body("errors[1].constraint", equalTo("Name is required"));
+                .body("errors.constraint", hasItems("Author is required", "Name is required"));
     }
 
 }
