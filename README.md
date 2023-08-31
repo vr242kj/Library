@@ -4,10 +4,8 @@
 > How to Run
 - Install Docker and Docker Compose:
   If you haven't already, you'll need to install Docker and Docker Compose on your system. You can find installation instructions on the official Docker website.
-- Create a Docker Compose File:
-  If you already have a Docker Compose file (usually named docker-compose.yml), make sure it's in the directory where you'll be running the Docker Compose commands.
 - Navigate to the Directory:
-  Open your terminal or command prompt and navigate to the directory containing your docker-compose.yml file.
+  Open your terminal or command prompt and navigate to the directory containing docker-compose.yml file(https://github.com/vr242kj/Library/blob/master/docker-compose.yml).
 - Run Docker Compose:
   To run in the background: docker-compose up
 - Open http://localhost:8081/book-library/swagger-ui/index.html with Swagger documentation.
