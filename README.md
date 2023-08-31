@@ -12,7 +12,7 @@
   To run in the background: docker-compose up
 - Open http://localhost:8081/book-library/swagger-ui/index.html with Swagger documentation.
 - Use collection API from Postman - https://elements.getpostman.com/redirect?entityId=15327265-6cc1306d-08ea-4510-a587-9edaa09d0a57&entityType=collection
-
+  Open collection LibraryService and select Library Environment
 > Get information about system health, configurations, etc.
 ```
 http://localhost:8081/book-library/actuator
