@@ -7,7 +7,7 @@
 - Navigate to the Directory:
   Open your terminal or command prompt and navigate to the directory containing docker-compose.yml file(https://github.com/vr242kj/Library/blob/master/docker-compose.yml).
 - Run Docker Compose:
-  To run in the background: docker-compose up
+  To run in the background: docker compose up
 - Open http://localhost:8081/book-library/swagger-ui/index.html with Swagger documentation.
 - Use collection API from Postman - https://elements.getpostman.com/redirect?entityId=15327265-6cc1306d-08ea-4510-a587-9edaa09d0a57&entityType=collection
   Open collection LibraryService and select Library Environment
