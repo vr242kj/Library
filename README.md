@@ -12,14 +12,12 @@ The service for tracking borrowed books and book readers (borrowers) ###
 * Use collection API from Postman - https://elements.getpostman.com/redirect?entityId=15327265-6cc1306d-08ea-4510-a587-9edaa09d0a57&entityType=collection
   - Open collection LibraryService and select Library Environment
 ## Get information about system health, configurations, etc.
-```
-http://localhost:8081/book-library/actuator
-http://localhost:8081/book-library/actuator/info
-http://localhost:8081/book-library/actuator/health
-http://localhost:8081/book-library/monitoring
-```
+```http://localhost:8081/book-library/actuator```
+```http://localhost:8081/book-library/actuator/info```
+```http://localhost:8081/book-library/actuator/health```
+```http://localhost:8081/book-library/monitoring```
 ## Environment variables
-> DEFAULT_MAX_BORROW_TIME_IN_DAYS: 14
-> MAX_BOOKS_FOR_BORROW: 5
-> MIN_AGE_FOR_RESTRICTED_BOOK: 18
+- DEFAULT_MAX_BORROW_TIME_IN_DAYS: 14
+- MAX_BOOKS_FOR_BORROW: 5
+- MIN_AGE_FOR_RESTRICTED_BOOK: 18
   
